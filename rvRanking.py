@@ -246,28 +246,38 @@ def assign_relevance(s):
         
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'
+_EMBEDDING_DIMENSION = 20
 
 #input: sparse tensor
 def get_feature_columns(token_len, keyname, default_value = 0):
     
     default_tensor = [default_value]*token_len
-
-    return tf.feature_column.numeric_column(key= keyname, 
-                                            shape=(token_len,),
-                                            dtype=tf.dtypes.int64,
-                                            default_value=default_tensor)
+    
+    sparse_column = tf.feature_column.categorical_column_with_identity(
+        key= keyname, num_buckets = 1000)
+    #indicator_column OR embedding_column but embedding gives floats
+    ##dense_column = tf.feature_column.indicator_column(sparse_column)
+    
+    dense_column = tf.feature_column.embedding_column(
+                sparse_column, _EMBEDDING_DIMENSION)
+    
+    return dense_column
+   # return tf.feature_column.numeric_column(key= keyname, 
+       #                                     shape=(token_len,),
+      #                                      dtype=tf.dtypes.int64,
+      #                                      default_value=default_tensor)
 def context_feature_columns():
     """Returns context feature names to column definitions."""
     event_token_len = 5 #evtype, rf_ff, gespever, hwx, uma
-    sparse_column = get_feature_columns(event_token_len, 'event_tokens')
-    return {"event_tokens": sparse_column}
+    dense_column = get_feature_columns(event_token_len, 'event_tokens')
+    return {"event_tokens": dense_column}
 
 def example_feature_columns():
     """Returns context feature names to column definitions."""
     rv_token_len = RV_TOKEN_LEN
-    sparse_column = get_feature_columns(rv_token_len, _RV_FEATURE )
+    dense_column = get_feature_columns(rv_token_len, _RV_FEATURE )
     
-    return {"rv_tokens": sparse_column}
+    return {"rv_tokens": dense_column}
 
 #as in example
 _LABEL_FEATURE = 'relevance'
@@ -298,6 +308,20 @@ def input_fn(path, num_epochs= 1): #none
     
     return features, label
 
+def make_transform_fn():
+    def _transform_fn(features, mode):
+        """Defines transform_fn."""
+        context_features, example_features = tfr.feature.encode_listwise_features(
+            features=features,
+            context_feature_columns=context_feature_columns(),
+            example_feature_columns=example_feature_columns(),
+            mode=mode,
+            scope="transform_layer")
+        
+        return context_features, example_features
+    return _transform_fn
+  
+  
 # The following functions can be used to convert a value to a type compatible
 # with tf.Example.
 
@@ -432,7 +456,7 @@ if __name__ == '__main__':
     for s in sample_list:
         i += 1
         if get_timerange(s) == False:
-            print(i, ' timerange too short')
+            print(i, 'timerange too short')
             continue
         get_example_features(s) #rvs, SHOULD BE ALWAYS SAME # OF RVS
         assign_relevance(s)
@@ -450,9 +474,21 @@ if __name__ == '__main__':
     print ('first 5 labels', labs[0,:5].numpy())
     event_t = feat['event_tokens'] #spare tensor to dense
     rv_t = feat['rv_tokens']
+    event_t = tf.sparse.to_dense(event_t)
+    rv_t = tf.sparse.to_dense(rv_t)
     print ('event values', event_t[0])
     #check slicing notification!
     print ('rv values', rv_t[0,:5,:10].numpy())
+    
+    transfunc = make_transform_fn()
+    cont_feats, ex_feats = transfunc(feat, 'test')
+    cont_feat_t = cont_feats['event_tokens']
+    examp_feat_t = ex_feats['rv_tokens']
+    print ('cont_feat_t', cont_feat_t.shape)
+    print ('examp_feat_t', examp_feat_t.shape)
+    
+    print ('first 5 cont features', cont_feat_t[0,:5].numpy())
+    print ('first 5 features von 1 doc', examp_feat_t[0,0,:5].numpy())
 
 
     print('finished')

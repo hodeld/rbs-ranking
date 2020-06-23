@@ -407,7 +407,9 @@ if __name__ == '__main__':
 
     
     #IMPORT
-    main_path = '/Users/daim/2 Projekte/RBS-Test/Wetlomat/deeplearning/alopt_files/'
+
+    base_path = '/Users/daim/2 Projekte/RBS-Test/Wetlomat/deeplearning/'
+    main_path = base_path + 'alopt_files/'
     timelines_raw = pd.read_csv(main_path+'timelines.csv', index_col =0) #, header=0)
     samples = pd.read_csv(main_path+'Samples.csv')
     rvs = pd.read_csv(main_path+'RVs.csv')
@@ -462,7 +464,7 @@ if __name__ == '__main__':
         assign_relevance(s)
         sample_list_prep.append(s)
         
-    file_path = '/Users/daim/2 Projekte/RBS-Test/Wetlomat/deeplearning/' + 'data.tfrecords'
+    file_path = base_path + 'data.tfrecords'
     
     write_context_examples(file_path, sample_list_prep) 
     
@@ -492,12 +494,3 @@ if __name__ == '__main__':
 
 
     print('finished')
-    
-    
-    
-    
-    
-    
-    
-        
-        

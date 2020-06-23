@@ -431,10 +431,10 @@ def write_context_examples(path, samples):
 
 
 if __name__ == '__main__':
-
+    from secrets import base_path
     # IMPORT
 
-    base_path = '/Users/daim/2 Projekte/RBS-Test/Wetlomat/deeplearning/'
+
     main_path = base_path + 'alopt_files/'
     timelines_raw = pd.read_csv(main_path + 'timelines.csv', index_col=0)  # , header=0)
     samples = pd.read_csv(main_path + 'Samples.csv')

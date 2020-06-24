@@ -1,17 +1,3 @@
-'''
-Created on 24 Mar 2020
-
-@author: daim
-'''
-'''
-Created on 24 Mar 2020
-
-@author: daim
-'''
-
-import sys
-# choose in runtime type
-
 import pandas as pd
 import tensorflow as tf
 import tensorflow_ranking as tfr
@@ -20,6 +6,9 @@ from tensorflow_serving.apis import input_pb2
 from datetime import datetime
 import copy
 import operator
+
+
+# recent version on colab!
 
 
 class Sample():
@@ -432,8 +421,8 @@ def write_context_examples(path, samples):
 
 if __name__ == '__main__':
     from secrets import base_path
-    # IMPORT
 
+    # IMPORT
 
     main_path = base_path + 'alopt_files/'
     timelines_raw = pd.read_csv(main_path + 'timelines.csv', index_col=0)  # , header=0)

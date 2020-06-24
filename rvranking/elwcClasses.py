@@ -1,5 +1,5 @@
-from globalVars import *
-from dataPrep import *
+from rvranking.globalVars import *
+from rvranking.dataPrep import *
 
 
 import copy

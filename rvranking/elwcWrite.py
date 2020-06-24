@@ -1,7 +1,7 @@
-from elwcClasses import Sample, SampleList, RV, RVList, prep_samples_list
-from elwcFunctions import write_context_examples
-from globalVars import _TRAIN_DATA_PATH, _TEST_DATA_PATH, _BASE_TF_DATA_PATH
-from dataPrep import samples, rvs
+from rvranking.elwcClasses import Sample, RV, RVList, prep_samples_list
+from rvranking.elwcFunctions import write_context_examples
+from rvranking.globalVars import _TRAIN_DATA_PATH, _TEST_DATA_PATH, _BASE_TF_DATA_PATH
+from rvranking.dataPrep import samples, rvs
 from pathlib import Path
 
 

@@ -28,7 +28,7 @@ KMAX = int(timelines_raw.columns[-1])  # last column name as int
 
 td_perwk = PPH * 24 * 7
 tot_size_tline = int((WEEKS_B + WEEKS_A) * td_perwk)
-rv_feat_len = 1
+rv_feat_len = 1  # rv.sex
 RV_TOKEN_LEN = rv_feat_len + tot_size_tline + 1  # pandas slice includes 1st value
 print(TD_SEQ, PPH, tot_size_tline)
 

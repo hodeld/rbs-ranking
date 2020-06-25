@@ -28,10 +28,11 @@ def _int64_list_feature(value):
 
 
 def write_context_examples(path, samples):
+
     def serialize_example(rv):
         """
         Creates a tf.Example message ready to be written to a file.
-        'rv.feat + rv.tline'
+        concententate: 'rv.feat + rv.tline'
         """
         # Create a dictionary mapping the feature name to the tf.Example-compatible
         # data type.

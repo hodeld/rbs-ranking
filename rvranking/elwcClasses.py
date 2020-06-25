@@ -87,6 +87,7 @@ class RV():
         self.tline = None
 
     def features(self):
+        """concententate """
         flist = [
             self.sex,
             *self.tline,
@@ -109,8 +110,11 @@ class RVList(list):
         ra = rv_attr
         f = operator.attrgetter(ra)
         for rv in self:
-            if f(rv) == vv:
-                return rv
+            try:
+                if f(rv) == vv:
+                    return rv
+            except ValueError as e:
+                print('err, attr', e, f(rv))
         return None
 
 
@@ -184,6 +188,9 @@ def set_tlines(s, sample_list):
     for eid in evs:
         ev = allevents.loc[eid]
         rvid = ev['Rv']
+        if type(rvid) == pd.core.series.Series:
+            print ('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
+            continue
         rv = rvli.get(rvid)
         if rv == None:
             continue  # only as day_evs for all locations

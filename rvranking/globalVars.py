@@ -1,9 +1,7 @@
-from secrets import base_path
-import os
+from rvranking.dataPrep import base_store_path
 
-#BASE PATH
-#base_path = ''
-
+_FAKE = False
+_FAKE = True
 
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
@@ -29,13 +27,13 @@ _LIST_SIZE = 5  #of rvs
 _PADDING_LABEL = -1
 
 # Parameters to the scoring function. part 1
-_BATCH_SIZE = 10 # 32
+_BATCH_SIZE = 32
 
 #following same as in example:
 
 # Store the paths to files containing training and test instances.
 #needed for write and read -> adapt on localhost
-_BASE_TF_DATA_PATH = base_path + "/tmp/tfdata"
+_BASE_TF_DATA_PATH = base_store_path + "/tfdata"
 _TRAIN_DATA_PATH = _BASE_TF_DATA_PATH + "/train.tfrecords"
 _TEST_DATA_PATH = _BASE_TF_DATA_PATH + "/test.tfrecords"
 
@@ -51,5 +49,6 @@ _DROPOUT_RATE = 0.8
 _GROUP_SIZE = 1  # Pointwise scoring.
 
 # Location of model directory and number of training steps.
-_MODEL_DIR = base_path + "/tmp/ranking_model_dir"
-_NUM_TRAIN_STEPS = 15 * 1000
+_MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
+#_NUM_TRAIN_STEPS = 15 * 1000
+_NUM_TRAIN_STEPS = 5 * 1000

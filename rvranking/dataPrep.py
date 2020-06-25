@@ -1,9 +1,27 @@
-import pandas as pd
-from datetime import datetime
-from secrets import base_path
+try:
+    import google.colab
+    IN_COLAB = True
+except:
+    IN_COLAB = False
 
-#drive.mount("/content/drive", force_remount=False)
-#base_path = '/content/drive/My Drive/Colab Notebooks/rbs-data'
+# %%
+
+if IN_COLAB:
+    from google.colab import drive
+    import pandas as pd
+
+    drive.mount("/content/drive", force_remount=False)
+    base_get_path = '/content/drive/My Drive/Colab Notebooks/rbs-data'
+    base_store_path = ''
+else:
+    from secrets import base_path
+    import pandas as pd
+    from datetime import datetime
+    import os
+
+    prjct_root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    base_store_path = prjct_root_path + '/output'
+    base_get_path = base_path
 
 main_path = base_path + '/alopt_files/'
 timelines_raw = pd.read_csv(main_path + 'timelines.csv', index_col=0)  # , header=0)

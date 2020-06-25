@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow_serving.apis import input_pb2
+from rvranking.globalVars import _FAKE
 
 # The following functions can be used to convert a value to a type compatible
 # with tf.Example.
@@ -36,10 +37,16 @@ def write_context_examples(path, samples):
         """
         # Create a dictionary mapping the feature name to the tf.Example-compatible
         # data type.
-        feature = {
-            'rv_tokens': _int64_list_feature(rv.features()),  # _RV_FEATURE
-            'relevance': _int64_feature(rv.relevance),  # _LABEL_FEATURE
-        }
+        if _FAKE:
+            feature = {
+                'rv_tokens': _int64_list_feature(rv.features_fake()),  # _RV_FEATURE
+                'relevance': _int64_feature(rv.relevance),  # _LABEL_FEATURE
+            }
+        else:
+            feature = {
+                'rv_tokens': _int64_list_feature(rv.features()),  # _RV_FEATURE
+                'relevance': _int64_feature(rv.relevance),  # _LABEL_FEATURE
+            }
         # Create a Features message using tf.train.Example.
 
         example = tf.train.Example(features=tf.train.Features(feature=feature))

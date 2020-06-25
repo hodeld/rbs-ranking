@@ -94,6 +94,14 @@ class RV():
         ]
         return flist
 
+    def features_fake(self):
+        """concententate """
+        if self.relevance == RELEVANCE:  # if it is correct rv
+            return [1]
+        else:
+            return [0]
+
+
 
 class RVList(list):
     '''base class for list of rvs'''
@@ -110,11 +118,9 @@ class RVList(list):
         ra = rv_attr
         f = operator.attrgetter(ra)
         for rv in self:
-            try:
-                if f(rv) == vv:
-                    return rv
-            except ValueError as e:
-                print('err, attr', e, f(rv))
+            if f(rv) == vv:
+                return rv
+
         return None
 
 
@@ -260,7 +266,6 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
         sample_list_prep = []
         for s in sample_list:
             i += 1
-            print('sample', i)
             if get_timerange(s) == False:
                 print(i, 'timerange too short')
                 continue

@@ -275,13 +275,14 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
 
         return sample_list_prep
 
-    slice_int = int(len(sample_list_all) * train_ratio)
-    print(slice_int)
+    orig_list_len = len(sample_list_all)
+    slice_int = int(orig_list_len * train_ratio)
     random.shuffle(sample_list_all)
     sample_list_train = SampleList(sample_list_all[:slice_int])
     sample_list_test = SampleList(sample_list_all[slice_int:])
 
     s_list_train = get_list(sample_list_train)
     s_list_test = get_list(sample_list_test)
+    print('orig_list_len, train_len, test_list:', orig_list_len, len(s_list_train), len(s_list_test))
     return s_list_train, s_list_test
 

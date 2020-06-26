@@ -1,3 +1,5 @@
+import random
+
 import tensorflow as tf
 from tensorflow_serving.apis import input_pb2
 from rvranking.globalVars import _FAKE
@@ -29,6 +31,36 @@ def _int64_list_feature(value):
 
 
 def write_context_examples(path, samples):
+    def serialize_example_fake(relevance, rvfeatures):
+        """
+        fake -> same number in context and relevant example
+        """
+        # Create a dictionary mapping the feature name to the tf.Example-compatible
+        # data type.
+        feature = {
+            'rv_tokens': _int64_list_feature(rvfeatures),  # _RV_FEATURE
+            'relevance': _int64_feature(relevance),  # _LABEL_FEATURE
+        }
+        # Create a Features message using tf.train.Example.
+
+        example = tf.train.Example(features=tf.train.Features(feature=feature))
+
+        return example  # .SerializeToString()
+
+    def serialize_context_fake(contfeatures):
+        """
+        Creates a tf.Example message ready to be written to a file.
+        """
+
+        # Create a dictionary mapping the feature name to the tf.Example-compatible
+        # data type.
+        feature = {
+            'event_tokens': _int64_list_feature(contfeatures),
+        }
+        # Create a Features message using tf.train.Example.
+
+        context = tf.train.Example(features=tf.train.Features(feature=feature))
+        return context  # .SerializeToString()
 
     def serialize_example(rv):
         """
@@ -74,11 +106,28 @@ def write_context_examples(path, samples):
 
         rvli = s.rvli
         example_list = []
-        for rv in rvli:
-            example = serialize_example(rv)
-            example_list.append(example)
-        # context = serialize_context(s.features)
-        context = serialize_context(s.features())
+        if _FAKE:
+            #1 is relevant rest is not
+            #example = serialize_example_fake(1, [1])
+            #example_list.append(example)
+            for i in range(1, 2):
+                #relev = random.randint(0, 1)
+                if i == 1:
+                    relev = 1
+                else:
+                    relev = 0
+                example = serialize_example_fake(relev, [i])
+                example_list.append(example)
+            cont_feature = random.randint(1, 2)
+            #cont_feature = 1
+            context = serialize_context_fake([cont_feature])
+
+        else:
+            for rv in rvli:
+                example = serialize_example(rv)
+                example_list.append(example)
+            # context = serialize_context(s.features)
+            context = serialize_context(s.features())
 
         ELWC = input_pb2.ExampleListWithContext()
         ELWC.context.CopyFrom(context)

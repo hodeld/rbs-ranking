@@ -1,7 +1,8 @@
 import tensorflow as tf
 import tensorflow_ranking as tfr
 from rvranking.globalVars import (_GROUP_SIZE, _MODEL_DIR, _TRAIN_DATA_PATH, _TEST_DATA_PATH,
-                                  _NUM_TRAIN_STEPS)
+                                  _NUM_TRAIN_STEPS,
+                                  _SAVE_CHECKPOINT_STEPS)
 from rvranking.rankingComponents import make_score_fn, make_transform_fn, input_fn
 from rvranking.lossesMetrics import ranking_head
 
@@ -16,7 +17,7 @@ model_fn = tfr.model.make_groupwise_ranking_fn(
 def train_and_eval_fn():
   """Train and eval function used by `tf.estimator.train_and_evaluate`."""
   run_config = tf.estimator.RunConfig(
-      save_checkpoints_steps=1000)
+      save_checkpoints_steps=_SAVE_CHECKPOINT_STEPS)
   ranker = tf.estimator.Estimator(
       model_fn=model_fn,
       model_dir=_MODEL_DIR,

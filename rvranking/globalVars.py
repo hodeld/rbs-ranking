@@ -1,7 +1,7 @@
 from rvranking.dataPrep import base_store_path
 
 _FAKE = False
-_FAKE = True
+#_FAKE = True
 
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
@@ -19,7 +19,7 @@ _PADDING_LABEL = -1
 
 # The maximum number of rv's per event in the dataset.
 # Document lists are padded or truncated to this size.
-_LIST_SIZE = 5  #of rvs
+_LIST_SIZE = 2  #of rvs
 
 
 # Padding labels are set negative so that the corresponding examples can be
@@ -51,4 +51,8 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 # Location of model directory and number of training steps.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 5 * 1000
+_NUM_TRAIN_STEPS = 15 * 1000
+
+#_SAVE_CP_STEPS
+#_SAVE_CHECKPOINT_STEPS = 1000
+_SAVE_CHECKPOINT_STEPS = 1000

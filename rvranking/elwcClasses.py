@@ -87,7 +87,9 @@ class RV():
         self.tline = None
 
     def features(self):
-        """concententate """
+        """concententate
+        sex: 1 or 2
+        tline: [1 … 20]"""
         flist = [
             self.sex,
             *self.tline,
@@ -95,7 +97,6 @@ class RV():
         return flist
 
     def features_fake(self):
-        """concententate """
         if self.relevance == RELEVANCE:  # if it is correct rv
             return [1]
         else:

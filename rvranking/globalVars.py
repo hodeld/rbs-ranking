@@ -19,7 +19,7 @@ _PADDING_LABEL = -1
 
 # The maximum number of rv's per event in the dataset.
 # Document lists are padded or truncated to this size.
-_LIST_SIZE = 2  #of rvs
+_LIST_SIZE = 10  #of rvs
 
 
 # Padding labels are set negative so that the corresponding examples can be
@@ -44,15 +44,20 @@ _TEST_DATA_PATH = _BASE_TF_DATA_PATH + "/test.tfrecords"
 _LEARNING_RATE = 0.05
 
 # Parameters to the scoring function. part 2
+#hidden layers: between input and output
 _HIDDEN_LAYER_DIMS = ["64", "32", "16"]
+#dropout rate:fraction of zeroed out values in the output layer
 _DROPOUT_RATE = 0.8
 _GROUP_SIZE = 1  # Pointwise scoring.
 
 # Location of model directory and number of training steps.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
+# max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
 _NUM_TRAIN_STEPS = 15 * 1000
 
 #_SAVE_CP_STEPS
 #_SAVE_CHECKPOINT_STEPS = 1000
 _SAVE_CHECKPOINT_STEPS = 1000
+
+_NDGC_TOP_NRS = [1, 2, 5]

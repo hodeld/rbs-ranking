@@ -45,7 +45,7 @@ def example_feature_columns():
 
 # INPUT_FN
 
-
+#shuffle: true -> shuffle BEFORE Padding
 def input_fn(path, num_epochs=None):  # num_epochs was: none
     context_feature_spec = tf.feature_column.make_parse_example_spec(
         context_feature_columns().values())
@@ -153,11 +153,12 @@ def eval_metric_fns():
       for topn in _NDGC_TOP_NRS
   })
   # additional function: Computes precision as weighted average of relevant examples.
-  metric_fns.update({
+  precision_d = {
       "metric/precision@%d" % topn: tfr.metrics.make_ranking_metric_fn(
           tfr.metrics.RankingMetricKey.PRECISION, topn=topn)
       for topn in _NDGC_TOP_NRS
-  })
+  }
+  #metric_fns.update(precision_d)
 
   return metric_fns
 

@@ -13,7 +13,7 @@ import shutil
 from datetime import datetime
 
 
-if __name__ == '__main__':
+def main_routine():
     write_elwc()
     print('finished writing')
     ranker, train_spec, eval_spec = train_and_eval_fn()
@@ -55,6 +55,9 @@ if __name__ == '__main__':
     f.write('\n\n')
     f.close()
 
+
+if __name__ == '__main__':
+    main_routine()
 
 
 

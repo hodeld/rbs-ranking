@@ -4,7 +4,6 @@ try:
 except:
     IN_COLAB = False
 
-# %%
 
 if IN_COLAB:
     from google.colab import drive
@@ -31,8 +30,6 @@ allevents = pd.read_csv(main_path + 'AllEvents.csv', index_col=0)
 rvfirstev_raw = pd.read_csv(main_path + 'rvfirstev.csv', index_col=0)
 
 # TIMELINES
-
-#from datetime import datetime
 
 # help(timelines_raw.loc)
 dtform = '%Y-%m-%d %H:%M:%S'

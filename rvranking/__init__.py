@@ -9,8 +9,11 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   RELEVANCE,
                                   _SAVE_CHECKPOINT_STEPS)
 from rvranking.dataPrep import base_store_path
-import shutil
+from rvranking.baseline.rankNaive import rank_rvs
 from datetime import datetime
+
+# COLAB
+import shutil
 
 
 def main_routine():
@@ -25,11 +28,7 @@ def main_routine():
     print('show tensorbord on localhost:6006 -> run in terminal:', tb_cmd)
 
     #file
-    filename = 'hyparams_log.txt'
-    try:
-        f = open(base_store_path + '/' + filename, "a")
-    except NameError:
-        f = open(base_store_path + '/' + filename, "w+")
+
     res_d = result[0]
     comment = input('comment on run: ')
     hyparams = {'comment': comment,
@@ -46,6 +45,15 @@ def main_routine():
                 'save_checkpoint_steps': _SAVE_CHECKPOINT_STEPS,
                 }
     hyparams.update(res_d)
+
+
+def write_file(hyparams):
+    filename = 'hyparams_log.txt'
+    try:
+        f = open(base_store_path + '/' + filename, "a")
+    except NameError:
+        f = open(base_store_path + '/' + filename, "w+")
+
     f.write('date: ' + datetime.now().strftime('%c'))
     for k, v in hyparams.items():
         f.write('\n')
@@ -56,8 +64,18 @@ def main_routine():
     f.close()
 
 
+def baseline():
+    results = rank_rvs()
+    comment = input('comment on run: ')
+    hyparams = {'baseline': True,
+                'comment': comment}
+    write_file(hyparams)
+
+
+
 if __name__ == '__main__':
     main_routine()
+    #baseline()
 
 
 

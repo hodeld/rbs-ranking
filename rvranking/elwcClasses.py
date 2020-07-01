@@ -15,7 +15,7 @@ class Sample():
          start, end, rv, group, cat,
          evtype, rv_ff, gespever, hwx, uma) = sample_li
 
-        day = (start // 24 * PPH) * (24 * PPH)
+        day = int(start // (24 * PPH) * (24 * PPH))
         locday = str(location) + '-' + str(day)
 
         def get_li(li_str):
@@ -85,6 +85,7 @@ class RV():
         self.sex = sex
         self.relevance = 0
         self.tline = None
+        self.prediction = 0
 
     def features(self):
         """concententate
@@ -177,12 +178,12 @@ def set_tlines(s, sample_list):
     day_evs = s.day_evs  # rendomized only part of it to zero
     evs += day_evs
     sample_li = []
-    '''
-    -> delete ev and sev for 1 rv 
-    -> assign rvlist to sample
-    -> copy rvlist
-    -> delete ev and sev for next ev in 1 rv
-    -> rvlist gets more and more zeros'''
+
+    # delete ev and sev for 1 rv
+    # -> assign rvlist to sample
+    # -> copy rvlist
+    # -> delete ev and sev for next ev in 1 rv
+    # -> rvlist gets more and more zeros
     for eid in day_evs:
         ev = sample_list.get(eid)
         if ev == None:  # when samples are sliced
@@ -196,7 +197,7 @@ def set_tlines(s, sample_list):
         ev = allevents.loc[eid]
         rvid = ev['Rv']
         if type(rvid) == pd.core.series.Series:
-            print ('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
+            print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
             continue
         rv = rvli.get(rvid)
         if rv == None:
@@ -205,9 +206,9 @@ def set_tlines(s, sample_list):
             rv.tline.loc[str(ev['Start']):str(ev['End'])] = 0
         except(KeyError, ValueError) as e:
             print('event created outside timerange: err, start, end', e, ev['Start'], ev['End'])
-    # all day_evs have same rvli
-    for s in sample_li:
-        s.rvli = copy.deepcopy(rvli)
+    # day_evs do not have same rvli as they dont start at same time
+    #for s in sample_li:
+        #s.rvli = copy.deepcopy(rvli)
 
 
 def get_pot_rvs(s):

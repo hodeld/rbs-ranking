@@ -2,7 +2,7 @@ from rvranking.globalVars import RELEVANCE, _SAMPLING
 from rvranking.dataPrep import *
 from rvranking.logs import hplogger
 
-
+# in colab
 import copy
 import operator
 import random

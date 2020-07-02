@@ -1,5 +1,6 @@
+from rvranking.dataPrep import log_path
 import logging
-from rvranking.dataPrep import base_store_path
+
 
 hplogger = logging.getLogger('hyperlogger')
 
@@ -8,7 +9,7 @@ def logging_basic():
     """defines logger handling for hyperlogger"""
     # should be before any logging calls
     filename = 'hyparams_log.txt'
-    filepath = base_store_path + '/' + filename
+    filepath = log_path + '/' + filename
     hyperhandler = logging.FileHandler(filepath)
     #hyperhandler.setLevel(logging.INFO) # not needed as only one handler for this logger
 
@@ -17,7 +18,6 @@ def logging_basic():
 
     hplogger.addHandler(hyperhandler)
     hplogger.setLevel(logging.INFO)
-
 
 
 #not needed as there is own logger for hyper params

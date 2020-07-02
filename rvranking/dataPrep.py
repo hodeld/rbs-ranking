@@ -13,6 +13,7 @@ if IN_COLAB:
     drive.mount("/content/drive", force_remount=False)
     base_get_path = '/content/drive/My Drive/Colab Notebooks/rbs-data'
     base_store_path = ''
+    log_path = base_get_path + '/output'
 else:
     from secrets import base_path
     import pandas as pd
@@ -22,6 +23,7 @@ else:
     prjct_root_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
     base_store_path = prjct_root_path + '/output'
     base_get_path = base_path
+    log_path = base_store_path
 
 main_path = base_get_path + '/alopt_files/'
 timelines_raw = pd.read_csv(main_path + 'timelines.csv', index_col=0)  # , header=0)

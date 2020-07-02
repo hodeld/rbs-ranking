@@ -36,7 +36,7 @@ def main_routine():
     if not IN_COLAB:
         comment = input('comment on run: ')
     else:
-        comment: 'in colab'
+        comment = 'in colab'
     hyparams = {'comment': comment,
                 'fake': _FAKE,
                 'sampling method': _SAMPLING,

@@ -1,5 +1,6 @@
 import tensorflow as tf
 from rvranking.elwcWrite import write_elwc
+from rvranking.logs import logging_basic, hplogger
 from rvranking.model import train_and_eval_fn
 from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _BATCH_SIZE, _LEARNING_RATE, _DROPOUT_RATE,
@@ -11,6 +12,7 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
 from rvranking.dataPrep import base_store_path
 from rvranking.baseline.rankNaive import rank_rvs
 from datetime import datetime
+
 
 # COLAB
 import shutil
@@ -49,34 +51,25 @@ def main_routine():
 
 
 def write_file(hyparams):
-    filename = 'hyparams_log.txt'
-    try:
-        f = open(base_store_path + '/' + filename, "a")
-    except NameError:
-        f = open(base_store_path + '/' + filename, "w+")
-
-    f.write('date: ' + datetime.now().strftime('%c'))
+    hplogger.info('date: ' + datetime.now().strftime('%c'))
     for k, v in hyparams.items():
-        f.write('\n')
-        f.write(k + ': ' + str(v))
-    f.write('\n')
-    f.write('new run -----------------------------------------')
-    f.write('\n\n')
-    f.close()
+        hplogger.info(k + ': ' + str(v))
+    hplogger.info('new run -----------------------------------------')
 
 
 def baseline():
     ndcg1_mean = rank_rvs()
     print('ndcg1_mean', ndcg1_mean)
     comment = input('comment on run: ')
-    hyparams = {'baseline': True,
-                'comment': comment,
-                'ndcg1_mean': ndcg1_mean}
-    write_file(hyparams)
-
+    if not comment == 'n':
+        hyparams = {'baseline': True,
+                    'comment': comment,
+                    'ndcg1_mean': ndcg1_mean}
+        write_file(hyparams)
 
 
 if __name__ == '__main__':
+    logging_basic()
     main_routine()
     #baseline()
 

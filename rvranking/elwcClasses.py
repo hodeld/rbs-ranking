@@ -1,5 +1,6 @@
 from rvranking.globalVars import RELEVANCE, _SAMPLING
 from rvranking.dataPrep import *
+from rvranking.logs import hplogger
 
 
 import copy
@@ -220,7 +221,7 @@ def set_tlines_fillingup(s, sample_list):
     for eid in day_evs:
         si = sample_list.get(eid)
         if si is None:  # when samples are sliced
-            print('None ev in day evs')
+            # print('None ev in day evs')
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
@@ -250,7 +251,6 @@ def set_tlines_allzeroes(s, sample_list):
     for eid in day_evs:
         ev = sample_list.get(eid)
         if ev == None:  # when samples are sliced
-            print('None ev in day evs')
             continue
 
         evs += ev.sevs
@@ -317,27 +317,29 @@ def assign_relevance(s):
 
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
     def get_list(sample_list):
-        k_emptyrvli = 0
+        k_er, k_tr, k_rr,  = 0, 0, 0
         rvli_d = {}
         i = 0
         sample_list_prep = []
         for s in sample_list:
             i += 1
             if not get_timerange(s):
-                print(i, s.id, 'timerange too short')
+                k_tr += 1
                 continue
             get_example_features(s, rvli_d, rvlist_all, sample_list)  # rvs, SHOULD BE ALWAYS SAME # OF RVS
 
             if not assign_relevance(s):
-                print(i, s.id, 'no relevant rv in list')
+                k_rr += 1
                 continue
 
             if len(s.rvli) == 0:
-                k_emptyrvli += 1
-                print(i, s.id, 'no rvs in list')
+                k_er += 1
                 continue
             sample_list_prep.append(s)
-        print('k_emptyrvli', k_emptyrvli)
+        hplogger.info(' - '.join([mode_name, 'empty rv list: ' + str(k_er)]))
+        hplogger.info(' - '.join([mode_name, 'timerange too short: ' + str(k_tr)]))
+        hplogger.info(' - '.join([mode_name, 'no relevant rv in rvlist: ' + str(k_rr)]))
+
         return sample_list_prep
 
     orig_list_len = len(sample_list_all)
@@ -346,8 +348,16 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
     sample_list_train = SampleList(sample_list_all[:slice_int])
     sample_list_test = SampleList(sample_list_all[slice_int:])
 
+    mode_name = 'train'
     s_list_train = get_list(sample_list_train)
+    mode_name = 'test'
     s_list_test = get_list(sample_list_test)
-    print('orig_list_len, train_len, test_list:', orig_list_len, len(s_list_train), len(s_list_test))
+    msg = ' '.join(['orig_list_len, train_len, test_list:',
+                    str(orig_list_len),
+                    str(len(s_list_train)),
+                    str(len(s_list_test))
+                    ])
+    print(msg)
+    hplogger.info(msg)
     return s_list_train, s_list_test
 

@@ -1,4 +1,4 @@
-from rvranking.globalVars import *
+from rvranking.globalVars import RELEVANCE, _SAMPLING
 from rvranking.dataPrep import *
 
 
@@ -104,7 +104,6 @@ class RV():
             return [0]
 
 
-
 class RVList(list):
     '''base class for list of rvs'''
 
@@ -127,15 +126,24 @@ class RVList(list):
 
 
 def get_example_features(s, rvli_d, rvlist_all, sample_list):
-    if s.rvli == None:
-        rvli = get_rvlist(s, rvli_d, rvlist_all)
-        s.rvli = rvli
-        set_tlines(s, sample_list)
+    if s.rvli is None:  # all day events have already rvli
+        if _SAMPLING == 'filling_up':
+            s.rvli = get_rvlist_fresh(s, rvli_d, rvlist_all)
+            set_tlines_fillingup(s, sample_list)
+        else:
+            s.rvli = get_rvlist_from_dict(s, rvli_d, rvlist_all)
+            set_tlines_allzeroes(s, sample_list)
     cut_timelines(s)
     get_pot_rvs(s)
 
 
-def get_rvlist(s, rvli_d, rvlist_all):
+def get_rvlist_fresh(s, rvli_d, rvlist_all):
+    rvlist = rvlist_all.filter(s.location, 'location')  # [rv for rv in rvs if rv.location == loc_id]
+    rvlist = get_rv_timelines(rvlist, s)  # same for all same day events
+    return rvlist
+
+
+def get_rvlist_from_dict(s, rvli_d, rvlist_all):
     rvlist = rvli_d.get(s.locday, None)
     if rvlist:
         return rvlist
@@ -157,7 +165,10 @@ def cut_timelines(s):
     ist = s.rangestart
     iet = s.rangeend
     for rv in s.rvli:
-        rv.tline = rv.tline.loc[str(ist):str(iet)]
+        try:
+            rv.tline = rv.tline.loc[str(ist):str(iet)]
+        except:
+            print('shit happens here')
 
 
 def get_timerange(s):
@@ -177,7 +188,51 @@ def get_timerange(s):
     return True
 
 
-def set_tlines(s, sample_list):
+def remove_evs(evs, rvli):
+    for eid in evs:
+        ev = allevents.loc[eid]
+        rvid = ev['Rv']
+        if type(rvid) == pd.core.series.Series:
+            print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
+            continue
+        rv = rvli.get(rvid)
+        if rv is None:
+            continue  # only as day_evs for all locations
+        try:
+            rv.tline.loc[str(ev['Start']):str(ev['End'])] = 0
+        except(KeyError, ValueError) as e:
+            print('event created outside timerange: err, start, end', e, ev['Start'], ev['End'])
+
+
+def set_tlines_fillingup(s, sample_list):
+    """
+    - day_evs are all events CREATED on the same day (or later) including sample itself
+    - iterate through day events (samples):
+        - delete ev and all connected sevs for assigned rv for this sample
+        - copy rvlist and assign to next sample
+    - last sample most empty timelines in rvlist
+    - cut to the exact length is after that (in other function)
+    """
+
+    day_evs = s.day_evs  # rendomized only part of it to zero
+
+    rvli = s.rvli
+    for eid in day_evs:
+        si = sample_list.get(eid)
+        if si is None:  # when samples are sliced
+            print('None ev in day evs')
+            continue
+        evs = [eid]
+        evs += si.sevs  # can be empty list
+        remove_evs(evs, rvli)
+        rvli = copy.deepcopy(rvli)
+        si.rvli = rvli
+        for r in rvli:
+            if r.tline.size < 13344:
+                print('already cut')
+
+
+def set_tlines_allzeroes(s, sample_list):
     """
     - day_evs are all events CREATED on the same day (or later
     - delete for each event all connected events for assigned rv
@@ -201,19 +256,8 @@ def set_tlines(s, sample_list):
         evs += ev.sevs
         sample_li.append(ev)
 
-    for eid in evs:
-        ev = allevents.loc[eid]
-        rvid = ev['Rv']
-        if type(rvid) == pd.core.series.Series:
-            print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
-            continue
-        rv = rvli.get(rvid)
-        if rv is None:
-            continue  # only as day_evs for all locations
-        try:
-            rv.tline.loc[str(ev['Start']):str(ev['End'])] = 0
-        except(KeyError, ValueError) as e:
-            print('event created outside timerange: err, start, end', e, ev['Start'], ev['End'])
+    remove_evs(evs, rvli)
+
     # day_evs have same rvli -> exact cutting is in next step
     for s in sample_li:
         s.rvli = copy.deepcopy(rvli)
@@ -271,7 +315,6 @@ def assign_relevance(s):
     return True
 
 
-
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
     def get_list(sample_list):
         k_emptyrvli = 0
@@ -286,7 +329,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
             get_example_features(s, rvli_d, rvlist_all, sample_list)  # rvs, SHOULD BE ALWAYS SAME # OF RVS
 
             if not assign_relevance(s):
-                print(i, s.id, 'no relevant rv list')
+                print(i, s.id, 'no relevant rv in list')
                 continue
 
             if len(s.rvli) == 0:

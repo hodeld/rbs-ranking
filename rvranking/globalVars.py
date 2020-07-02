@@ -1,8 +1,10 @@
 from rvranking.dataPrep import base_store_path
+# if variable starts with "_" -> cannot imported by import * !
 
 _FAKE = False
 #_FAKE = True
 
+_SAMPLING = 'filling_up'  # 'all_zero' OR 'filling_up'
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'

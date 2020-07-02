@@ -45,6 +45,7 @@ def main_routine():
                 'save_checkpoint_steps': _SAVE_CHECKPOINT_STEPS,
                 }
     hyparams.update(res_d)
+    write_file(hyparams)
 
 
 def write_file(hyparams):
@@ -65,10 +66,12 @@ def write_file(hyparams):
 
 
 def baseline():
-    results = rank_rvs()
+    ndcg1_mean = rank_rvs()
+    print('ndcg1_mean', ndcg1_mean)
     comment = input('comment on run: ')
     hyparams = {'baseline': True,
-                'comment': comment}
+                'comment': comment,
+                'ndcg1_mean': ndcg1_mean}
     write_file(hyparams)
 
 

@@ -8,8 +8,9 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _NUM_TRAIN_STEPS,
                                   _EMBEDDING_DIMENSION,
                                   RELEVANCE,
-                                  _SAVE_CHECKPOINT_STEPS)
-from rvranking.dataPrep import base_store_path
+                                  _SAVE_CHECKPOINT_STEPS,
+                                  _SAMPLING)
+from rvranking.dataPrep import base_store_path, IN_COLAB
 from rvranking.baseline.rankNaive import rank_rvs
 from datetime import datetime
 
@@ -32,9 +33,13 @@ def main_routine():
     #file
 
     res_d = result[0]
-    comment = input('comment on run: ')
+    if not IN_COLAB:
+        comment = input('comment on run: ')
+    else:
+        comment: 'in colab'
     hyparams = {'comment': comment,
                 'fake': _FAKE,
+                'sampling method': _SAMPLING,
                 'embedding_dimension': _EMBEDDING_DIMENSION,
                 'relevance': RELEVANCE,
                 'list_size': _LIST_SIZE,

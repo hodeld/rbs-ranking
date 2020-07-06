@@ -1,4 +1,5 @@
 from rvranking.dataPrep import base_store_path
+import tensorflow_ranking as tfr
 # if variable starts with "_" -> cannot imported by import * !
 
 _FAKE = False
@@ -45,6 +46,9 @@ _TEST_DATA_PATH = _BASE_TF_DATA_PATH + "/test.tfrecords"
 # Learning rate for optimizer.
 _LEARNING_RATE = 0.05
 
+#Loss Function
+_LOSS = tfr.losses.RankingLossKey.APPROX_MRR_LOSS
+
 # Parameters to the scoring function. part 2
 #hidden layers: between input and output
 _HIDDEN_LAYER_DIMS = ["64", "32", "16"]
@@ -56,10 +60,10 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 # max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 5 * 1000
+_NUM_TRAIN_STEPS = 40 * 1000
 
 #_SAVE_CP_STEPS
 #_SAVE_CHECKPOINT_STEPS = 1000
 _SAVE_CHECKPOINT_STEPS = 1000
 
-_NDGC_TOP_NRS = [1, 2, 5]
+_RANK_TOP_NRS = [1, 2, 5]

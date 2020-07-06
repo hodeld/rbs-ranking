@@ -9,7 +9,8 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _EMBEDDING_DIMENSION,
                                   RELEVANCE,
                                   _SAVE_CHECKPOINT_STEPS,
-                                  _SAMPLING)
+                                  _SAMPLING,
+                                  _LOSS)
 from rvranking.dataPrep import base_store_path, IN_COLAB
 from rvranking.baseline.rankNaive import rank_rvs
 from datetime import datetime
@@ -41,6 +42,7 @@ def main_routine():
                 'fake': _FAKE,
                 'sampling method': _SAMPLING,
                 'embedding_dimension': _EMBEDDING_DIMENSION,
+                'loss_function': _LOSS,
                 'relevance': RELEVANCE,
                 'list_size': _LIST_SIZE,
                 'batch_size': _BATCH_SIZE,

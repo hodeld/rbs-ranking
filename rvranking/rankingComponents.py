@@ -4,7 +4,7 @@ from rvranking.dataPrep import RV_TOKEN_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
                                   _GROUP_SIZE,
-                                  _NDGC_TOP_NRS)
+                                  _RANK_TOP_NRS)
 
 
 
@@ -131,34 +131,49 @@ def make_score_fn():
 
 
 def eval_metric_fns():
-  """Returns a dict from name to metric functions.
+    """Returns a dict from name to metric functions.
 
-  This can be customized as follows. Care must be taken when handling padded
-  lists. (only takes labels >= 0.
+    This can be customized as follows. Care must be taken when handling padded
+    lists. (only takes labels >= 0.
 
-  def _auc(labels, predictions, features):
+    def _auc(labels, predictions, features):
     is_label_valid = tf_reshape(tf.greater_equal(labels, 0.), [-1, 1])
     clean_labels = tf.boolean_mask(tf.reshape(labels, [-1, 1], is_label_valid)
     clean_pred = tf.boolean_maks(tf.reshape(predictions, [-1, 1], is_label_valid)
     return tf.metrics.auc(clean_labels, tf.sigmoid(clean_pred), ...)
-  metric_fns["auc"] = _auc
+    metric_fns["auc"] = _auc
 
-  Returns:
+    Returns:
     A dict mapping from metric name to a metric function with above signature.
-  """
-  metric_fns = {}
-  metric_fns.update({
+    """
+    metric_fns = {}
+    metric_fns.update({
       "metric/ndcg@%d" % topn: tfr.metrics.make_ranking_metric_fn(
           tfr.metrics.RankingMetricKey.NDCG, topn=topn)
-      for topn in _NDGC_TOP_NRS
-  })
-  # additional function: Computes precision as weighted average of relevant examples.
-  precision_d = {
-      "metric/precision@%d" % topn: tfr.metrics.make_ranking_metric_fn(
-          tfr.metrics.RankingMetricKey.PRECISION, topn=topn)
-      for topn in _NDGC_TOP_NRS
-  }
-  #metric_fns.update(precision_d)
+      for topn in _RANK_TOP_NRS
+    })
 
-  return metric_fns
+    # metric_fns.update(precision_d)
+    # The reciprocal rank of a query response is the multiplicative inverse of the rank
+    # of the first correct answer:
+    # 1 for first place, ​1⁄2 for second place, ​1⁄3 for third place and so on
+
+    # with topn: -> checks if there is a relevant item up to this rank
+    # so mrr@1 -> checks only first ranked item if this is relevant otherwise result is zero
+    # see  test_mean_reciprocal_rank
+    # MRR all makes more sense (checks all ranks for first correct answer)
+
+    mrr_d_all = {
+        "metric/MRR@ALL": tfr.metrics.make_ranking_metric_fn(
+            tfr.metrics.RankingMetricKey.MRR, topn=None)
+    }
+    mrr_d = {
+      "metric/MRR@%d" % topn: tfr.metrics.make_ranking_metric_fn(
+          tfr.metrics.RankingMetricKey.MRR, topn=topn)
+      for topn in _RANK_TOP_NRS
+    }
+    metric_fns.update(mrr_d_all)
+    metric_fns.update(mrr_d)
+
+    return metric_fns
 

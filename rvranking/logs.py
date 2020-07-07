@@ -1,5 +1,6 @@
 from rvranking.dataPrep import log_path
 import logging
+from datetime import datetime
 
 
 hplogger = logging.getLogger('hyperlogger')
@@ -18,6 +19,7 @@ def logging_basic():
 
     hplogger.addHandler(hyperhandler)
     hplogger.setLevel(logging.INFO)
+    hplogger.info('date: ' + datetime.now().strftime('%c'))
 
 
 #not needed as there is own logger for hyper params

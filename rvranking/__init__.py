@@ -13,14 +13,15 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _LOSS)
 from rvranking.dataPrep import base_store_path, IN_COLAB
 from rvranking.baseline.rankNaive import rank_rvs
-from datetime import datetime
 
 
 # COLAB
 import shutil
 
+from rvranking.prediction import make_predictions, get_next_prediction
 
-def main_routine():
+
+def main_routine(include_comment=True):
     write_elwc()
     print('finished writing')
     ranker, train_spec, eval_spec = train_and_eval_fn()
@@ -34,7 +35,7 @@ def main_routine():
     #file
 
     res_d = result[0]
-    if not IN_COLAB:
+    if not IN_COLAB and include_comment:
         comment = input('comment on run: ')
     else:
         comment = 'in colab'
@@ -55,10 +56,10 @@ def main_routine():
                 }
     hyparams.update(res_d)
     write_file(hyparams)
+    return ranker
 
 
 def write_file(hyparams):
-    hplogger.info('date: ' + datetime.now().strftime('%c'))
     for k, v in hyparams.items():
         hplogger.info(k + ': ' + str(v))
     hplogger.info('new run -----------------------------------------')
@@ -75,10 +76,22 @@ def baseline():
         write_file(hyparams)
 
 
+def predictions():
+    ranker = 'd'
+    ranker = main_routine(False)
+
+    predicts = make_predictions(ranker)
+    p1 = get_next_prediction(predicts)
+    print(p1)
+
+
 if __name__ == '__main__':
     logging_basic()
     main_routine()
     #baseline()
+    #predictions()  # including train
+
+
 
 
 

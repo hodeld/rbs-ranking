@@ -126,38 +126,39 @@ class RVList(list):
         return None
 
 
-def get_example_features(s, rvli_d, rvlist_all, sample_list):
+def get_example_features(s, rvli_d, rvlist_all, sample_list,
+                         timelines_spec, rvfirstev_spec, allevents_spec):
     if s.rvli is None:  # all day events have already rvli
         if _SAMPLING == 'filling_up':
-            s.rvli = get_rvlist_fresh(s, rvli_d, rvlist_all)
-            set_tlines_fillingup(s, sample_list)
+            s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
+            set_tlines_fillingup(s, sample_list, allevents_spec)
         else:
-            s.rvli = get_rvlist_from_dict(s, rvli_d, rvlist_all)
-            set_tlines_allzeroes(s, sample_list)
+            s.rvli = get_rvlist_from_dict(s, rvli_d, rvlist_all, timelines_spec)
+            set_tlines_allzeroes(s, sample_list, allevents_spec)
     cut_timelines(s)
-    get_pot_rvs(s)
+    get_pot_rvs(s, rvfirstev_spec)
 
 
-def get_rvlist_fresh(s, rvli_d, rvlist_all):
+def get_rvlist_fresh(s, rvlist_all, timelines_spec):
     rvlist = rvlist_all.filter(s.location, 'location')  # [rv for rv in rvs if rv.location == loc_id]
-    rvlist = get_rv_timelines(rvlist, s)  # same for all same day events
+    rvlist = get_rv_timelines(timelines_spec, rvlist)  # same for all same day events
     return rvlist
 
 
-def get_rvlist_from_dict(s, rvli_d, rvlist_all):
+def get_rvlist_from_dict(s, rvli_d, rvlist_all, timelines_spec):
     rvlist = rvli_d.get(s.locday, None)
     if rvlist:
         return rvlist
 
     rvlist = rvlist_all.filter(s.location, 'location')  # [rv for rv in rvs if rv.location == loc_id]
-    rvlist = get_rv_timelines(rvlist, s)  # same for all same day events
+    rvlist = get_rv_timelines(timelines_spec, rvlist)  # same for all same day events
     rvli_d[s.locday] = rvlist
     return rvlist
 
 
-def get_rv_timelines(rvlist, s):
+def get_rv_timelines(timelines_spec, rvlist):
     for rv in rvlist:
-        tline = timelines.loc[str(rv.id)]
+        tline = timelines_spec.loc[str(rv.id)]
         rv.tline = tline
     return rvlist
 
@@ -189,9 +190,9 @@ def get_timerange(s):
     return True
 
 
-def remove_evs(evs, rvli):
+def remove_evs(evs, rvli, allevs_spec):
     for eid in evs:
-        ev = allevents.loc[eid]
+        ev = allevs_spec.loc[eid]
         rvid = ev['Rv']
         if type(rvid) == pd.core.series.Series:
             print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
@@ -205,7 +206,7 @@ def remove_evs(evs, rvli):
             print('event created outside timerange: err, start, end', e, ev['Start'], ev['End'])
 
 
-def set_tlines_fillingup(s, sample_list):
+def set_tlines_fillingup(s, sample_list, allevents_spec):
     """
     - day_evs are all events CREATED on the same day (or later) including sample itself
     - iterate through day events (samples):
@@ -225,15 +226,12 @@ def set_tlines_fillingup(s, sample_list):
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
-        remove_evs(evs, rvli)
+        remove_evs(evs, rvli, allevents_spec)
         rvli = copy.deepcopy(rvli)
         si.rvli = rvli
-        for r in rvli:
-            if r.tline.size < 13344:
-                print('already cut')
 
 
-def set_tlines_allzeroes(s, sample_list):
+def set_tlines_allzeroes(s, sample_list, allevents_spec):
     """
     - day_evs are all events CREATED on the same day (or later
     - delete for each event all connected events for assigned rv
@@ -256,20 +254,20 @@ def set_tlines_allzeroes(s, sample_list):
         evs += ev.sevs
         sample_li.append(ev)
 
-    remove_evs(evs, rvli)
+    remove_evs(evs, rvli, allevents_spec)
 
     # day_evs have same rvli -> exact cutting is in next step
     for s in sample_li:
         s.rvli = copy.deepcopy(rvli)
 
 
-def get_pot_rvs(s):
-    rvlist = s.rvli
+def get_pot_rvs(s, rvfirstev_spec):
+    rvlist = s.rvli.copy() # needs to be seperate list with same items to remove items and iterate over!
     for rv in rvlist:
         if check_availability(rv, s) == False:
-            rvlist.remove(rv)
-        elif check_evtype(rv, s) == False:
-            rvlist.remove(rv)
+            s.rvli.remove(rv)
+        elif check_evtype(rv, s, rvfirstev_spec) == False:
+            s.rvli.remove(rv)
     check_feat(rv, s)  # probably better leave features
 
 
@@ -285,8 +283,8 @@ def check_availability(rv, s):
         return True
 
 
-def check_evtype(rv, s):
-    firstev = rvfirstev.loc[rv.id, str(s.evtype)]  # 1, None or date_int
+def check_evtype(rv, s, rvfirstev_spec):
+    firstev = rvfirstev_spec.loc[rv.id, str(s.evtype)]  # 1, None or date_int
     if firstev == None:
         return False
     if firstev <= s.start:
@@ -315,7 +313,8 @@ def assign_relevance(s):
     return True
 
 
-def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
+def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
+                      timelines_spec, rvfirstev_spec, allevents_spec):
     def get_list(sample_list):
         k_er, k_tr, k_rr,  = 0, 0, 0
         rvli_d = {}
@@ -326,7 +325,10 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio):
             if not get_timerange(s):
                 k_tr += 1
                 continue
-            get_example_features(s, rvli_d, rvlist_all, sample_list)  # rvs, SHOULD BE ALWAYS SAME # OF RVS
+            get_example_features(s, rvli_d, rvlist_all, sample_list,
+                                 timelines_spec=timelines_spec,
+                                 rvfirstev_spec=rvfirstev_spec,
+                                 allevents_spec=allevents_spec)  # rvs, SHOULD BE ALWAYS SAME # OF RVS
 
             if not assign_relevance(s):
                 k_rr += 1

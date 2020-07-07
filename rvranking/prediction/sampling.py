@@ -1,6 +1,6 @@
 from rvranking.dataPrep import main_path
-from rvranking.elwcClasses import Sample, RV, RVList, prep_samples_list
-from rvranking.elwcFunctions import write_context_examples
+from rvranking.sampling.main import Sample, RV, RVList, prep_samples_list
+from rvranking.sampling.elwcFunctions import write_context_examples
 import pandas as pd
 
 

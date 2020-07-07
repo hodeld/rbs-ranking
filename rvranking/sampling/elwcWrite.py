@@ -1,5 +1,5 @@
-from rvranking.elwcClasses import Sample, RV, RVList, prep_samples_list
-from rvranking.elwcFunctions import write_context_examples
+from rvranking.sampling.main import Sample, RV, RVList, prep_samples_list
+from rvranking.sampling.elwcFunctions import write_context_examples
 from rvranking.globalVars import _TRAIN_DATA_PATH, _TEST_DATA_PATH, _BASE_TF_DATA_PATH
 from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents
 

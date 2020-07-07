@@ -1,5 +1,5 @@
 import tensorflow as tf
-from rvranking.elwcWrite import write_elwc
+from rvranking.sampling.elwcWrite import write_elwc
 from rvranking.logs import logging_basic, hplogger
 from rvranking.model import train_and_eval_fn
 from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
@@ -13,12 +13,13 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _LOSS)
 from rvranking.dataPrep import base_store_path, IN_COLAB
 from rvranking.baseline.rankNaive import rank_rvs
+from rvranking.prediction import make_predictions, get_next_prediction
 
 
 # COLAB
 import shutil
 
-from rvranking.prediction import make_predictions, get_next_prediction
+
 
 
 def main_routine(include_comment=True):
@@ -66,19 +67,23 @@ def write_file(hyparams):
 
 
 def baseline():
-    ndcg1_mean = rank_rvs()
-    print('ndcg1_mean', ndcg1_mean)
+    ndcg1_mean, mrr_mean = rank_rvs()
+    print('ndcg1_mean:', ndcg1_mean, 'mrr_mean:', mrr_mean)
     comment = input('comment on run: ')
     if not comment == 'n':
         hyparams = {'baseline': True,
                     'comment': comment,
-                    'ndcg1_mean': ndcg1_mean}
+                    'ndcg1_mean': ndcg1_mean,
+                    'mrr_mean:': mrr_mean,
+                    }
         write_file(hyparams)
 
 
 def predictions():
     ranker = 'd'
-    ranker = main_routine(False)
+
+    ranker = main_routine()
+    #ranker.export_saved_model('path', 'serving_inout_receiver_fn')
 
     predicts = make_predictions(ranker)
     p1 = get_next_prediction(predicts)
@@ -87,8 +92,8 @@ def predictions():
 
 if __name__ == '__main__':
     logging_basic()
-    main_routine()
-    #baseline()
+    #main_routine()
+    baseline()
     #predictions()  # including train
 
 

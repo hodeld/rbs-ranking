@@ -42,17 +42,20 @@ def predict_rv(s):
             prio += prio_freetime(rv, st_range, et_range)
         rv_sort_list.append((rv, prio))
     rv_sort_list.sort(key=lambda rv_p: rv_p[1], reverse=False)
-    rv1st = rv_sort_list[0][0]
 
     # simplified as just look at 1st -> if correct ngcd = 1, else = 0
-    ndcg1 = 0
-    for rv in rvli:
-        if rv == rv1st:
-            rv.prediction = RELEVANCE  # else = 0
-            if s.rv == rv.id:
+    ndcg1, mrr = 0, 0
+    for i, rv_p in enumerate(rv_sort_list):
+        rv = rv_p[0]
+        rank = i + 1
+        if s.rv == rv.id:
+            if rank == 1:
                 ndcg1 = 1
+            mrr = 1/rank
             break
-    return ndcg1
+    if mrr == 0:
+        print('rv not found')
+    return ndcg1, mrr
 
 
 def prio_masterev(rv, wk_start, wk_end, evs_same_mev):

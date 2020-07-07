@@ -1,5 +1,6 @@
 from rvranking.baseline.priorizeRV import predict_rv
-from rvranking.sampling.main import Sample, RV, RVList, prep_samples_list
+from rvranking.sampling.main import prep_samples_list
+from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents
 
 

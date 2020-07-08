@@ -1,6 +1,6 @@
 import operator
 
-from rvranking import RELEVANCE
+from rvranking.globalVars import RELEVANCE
 from rvranking.dataPrep import PPH
 
 

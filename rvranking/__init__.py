@@ -94,7 +94,7 @@ def predictions():
 
 
 if __name__ == '__main__':
-    #logging_basic()
+    logging_basic()
 
     dispatch_fn = {
         1: main_routine,

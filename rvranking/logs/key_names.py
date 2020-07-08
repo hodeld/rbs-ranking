@@ -2,6 +2,7 @@ LOG_KEYS = [
     'nr',
     'date',
     'comment',
+    'comment_predict',
 
     #global vars
     'fake',
@@ -26,6 +27,7 @@ LOG_KEYS = [
     'loss',
     'labels_mean',
     'logits_mean',
+    'mean_rvs',
 
 
     # baseline

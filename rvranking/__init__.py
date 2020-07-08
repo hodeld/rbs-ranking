@@ -72,6 +72,7 @@ def baseline():
     if not comment == 'n':
         hyparams = {'baseline': True,
                     'comment': comment,
+                    'sampling method': _SAMPLING,
                     'ndcg1_mean': ndcg1_mean,
                     'mrr_mean:': mrr_mean,
                     }
@@ -88,7 +89,7 @@ def predictions():
     p1 = get_next_prediction(predicts)
     print(p1)
     comment = input('comment on prediction: ')
-    hplogger.info('comment on prediction: ' + comment)
+    hplogger.info('comment_predict: ' + comment)
     hplogger.info('predictions: ' + str(p1))
 
 
@@ -100,7 +101,7 @@ if __name__ == '__main__':
         2: baseline,
         3: predictions,  # including train
     }
-    dispatch_fn[4]()
+    dispatch_fn[3]()
 
 
 

@@ -1,5 +1,4 @@
-from rvranking import train_and_eval_fn, _LIST_SIZE
-from rvranking.globalVars import _BASE_TF_DATA_PATH
+from rvranking.globalVars import _BASE_TF_DATA_PATH, _LIST_SIZE_PREDICT
 from rvranking.prediction.modelComponents import predict_input_fn
 from rvranking.prediction.sampling import write_testsamples
 
@@ -13,5 +12,5 @@ def make_predictions(ranker):
 
 def get_next_prediction(predictions):
     x = next(predictions)
-    assert(len(x) == _LIST_SIZE)  ## Note that this includes padding.
+    assert(len(x) == _LIST_SIZE_PREDICT)  ## Note that this includes padding.
     return x

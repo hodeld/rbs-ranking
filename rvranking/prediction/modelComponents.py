@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow_ranking as tfr
 
-from rvranking.globalVars import _BATCH_SIZE, _LIST_SIZE
+from rvranking.globalVars import _BATCH_SIZE, _LIST_SIZE_PREDICT
 from rvranking.rankingComponents import context_feature_columns, example_feature_columns
 
 
@@ -23,7 +23,7 @@ def predict_input_fn(path):
         file_pattern=path,
         data_format=tfr.data.ELWC,
         batch_size=_BATCH_SIZE,
-        list_size=_LIST_SIZE,
+        list_size=_LIST_SIZE_PREDICT,
         context_feature_spec=context_feature_spec,
         example_feature_spec=example_feature_spec,
         reader=tf.data.TFRecordDataset,

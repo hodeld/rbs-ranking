@@ -61,4 +61,3 @@ timelines = timelines.apply(pd.to_numeric)
 # RVS first ev
 rvfirstev = rvfirstev_raw.copy()
 rvfirstev[rvfirstev_raw == 0] = 1
-

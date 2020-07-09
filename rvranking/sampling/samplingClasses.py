@@ -10,7 +10,7 @@ class Sample():
     def __init__(self, sample_li):
         (s_id, location, dbid, day_evs, sevs, rv_eq,
          start, end, rv, group, cat,
-         evtype, rv_ff, gespever, hwx, uma) = sample_li
+         evtype, rv_ff, gespever, hwx, uma, teams) = sample_li
 
         day = int(start // (24 * PPH) * (24 * PPH))
         locday = str(location) + '-' + str(day)

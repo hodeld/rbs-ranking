@@ -35,11 +35,26 @@ def tlines_zero_corresponding(tline_vars):
     s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
     tlines_zero_corresponding(s, sample_list, allevents_spec)
 
+# filling_up:
+# iterates through day evs
+# deletes all ev + sevs for all rvs ev
+
+# zero_corresponding:
+# as filling_up but only deletes ev + sevs for corresp. rv
+
+# all_zero:
+# as zero_corresponding but iterates first then assigns rvlist for all events
+
+# filling_opposite:
+# deletes all events and sevs of  day evs,
+# then adds events again for corresp. rv
+# rvlist for last hast most events
+
 
 tline_fn_d = {'filling_up': filling_up,
               'filling_opposite': filling_opposite,
-              'all_zero': all_zero,
-              'zero_corresponding': tlines_zero_corresponding
+              'all_zero': all_zero,  # all events rvlist smaller than 10
+              'zero_corresponding': tlines_zero_corresponding  # all events rvlist smaller than 10
               }
 
 
@@ -239,6 +254,6 @@ def set_tlines_allzeroes(s, sample_list, allevents_spec):
 
 def get_sample(sample_list, eid):
     s = sample_list.get(eid)
-    if s is None:  # when samples are sliced
-        print('ev not in sample_list; only for events at boundary of timeline', eid)
+    if s is None:  #  -> are still in allevents
+        print('ev not in sample_list; -> why?; eid:', eid)
     return s

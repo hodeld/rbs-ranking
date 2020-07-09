@@ -1,6 +1,7 @@
 LOG_KEYS = [
     'nr',
     'date',
+    'comment_new',  # empty
     'comment',
     'comment_predict',
 

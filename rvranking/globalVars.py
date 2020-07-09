@@ -5,7 +5,7 @@ import tensorflow_ranking as tfr
 _FAKE = False
 #_FAKE = True
 
-_SAMPLING = 'zero_corresponding'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding
+_SAMPLING = 'filling_up'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'
@@ -61,7 +61,7 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 # max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 1 * 1000
+_NUM_TRAIN_STEPS = 5 * 1000
 
 #_SAVE_CP_STEPS
 #_SAVE_CHECKPOINT_STEPS = 1000

@@ -8,8 +8,6 @@ from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
 # in colab
 import random
 
-
-
 def get_example_features(s, rvli_d, rvlist_all, sample_list,
                          timelines_spec, rvfirstev_spec, allevents_spec):
     if s.rvli is None:  # all day events have already rvli

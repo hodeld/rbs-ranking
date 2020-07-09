@@ -22,7 +22,21 @@ def logging_basic():
 
     hplogger.addHandler(hyperhandler)
     hplogger.setLevel(logging.INFO)
+
+    run_nr_file = log_path + '/' + 'run_nr.txt'
+    if os.path.exists(run_nr_file):
+        with open(run_nr_file) as f:
+            run_nr = int(f.readline())
+        os.remove(run_nr_file)  # this deletes the file
+    else:
+        run_nr = 0
+    run_nr += 1
+    run_nr_str = str(run_nr)
+    with open(run_nr_file, 'w') as f:
+        f.write(run_nr_str)
+    print('run nr:', run_nr)
     hplogger.info('new run -----------------------------------------')
+    hplogger.info('nr: ' + run_nr_str)
     hplogger.info('date: ' + datetime.now().strftime(DATE_FORMAT))
 
 
@@ -76,7 +90,7 @@ def logs_to_csv():
     csv_file = 'hyparams_log.csv'
     wfile_path = log_path + '/' + csv_file
 
-    if os.path.exists('TwitterDB.csv'):
+    if os.path.exists(wfile_path):
         os.remove(wfile_path)  # this deletes the file
     else:
         print("The file does not exist")  # add this to prevent errors
@@ -94,3 +108,4 @@ def logs_to_csv():
 
 if __name__ == '__main__':
     logs_to_csv()
+    print('csv written')

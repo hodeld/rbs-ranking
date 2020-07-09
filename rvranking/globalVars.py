@@ -5,7 +5,7 @@ import tensorflow_ranking as tfr
 _FAKE = False
 #_FAKE = True
 
-_SAMPLING = 'filling_opposite'  # 'all_zero' OR 'filling_up' OR filling_opposite
+_SAMPLING = 'zero_corresponding'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'

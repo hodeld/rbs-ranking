@@ -28,7 +28,7 @@ LOG_KEYS = [
     'labels_mean',
     'logits_mean',
     'mean_rvs',
-
+    'rvs_tooshort',
 
     # baseline
     'mrr_mean',
@@ -38,7 +38,7 @@ LOG_KEYS = [
     'predictions',
 
     # results
-    'orig_list_len, train_len, test_list',
+    'length orig, prep, train, test',
 
 
 ]

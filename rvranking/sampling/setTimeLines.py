@@ -16,7 +16,7 @@ def filling_opposite(tline_vars):
      timelines_spec, allevents_spec) = tline_vars[:-1]
 
     s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
-    set_tlines_fill_oposite(s, sample_list, allevents_spec)
+    set_tlines_fill_opposite(s, sample_list, allevents_spec)
 
 
 def all_zero(tline_vars):
@@ -28,9 +28,18 @@ def all_zero(tline_vars):
     set_tlines_allzeroes(s, sample_list, allevents_spec)
 
 
+def tlines_zero_corresponding(tline_vars):
+    (s, rvlist_all, sample_list,
+     timelines_spec, allevents_spec) = tline_vars[:-1]
+
+    s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
+    tlines_zero_corresponding(s, sample_list, allevents_spec)
+
+
 tline_fn_d = {'filling_up': filling_up,
               'filling_opposite': filling_opposite,
               'all_zero': all_zero,
+              'zero_corresponding': tlines_zero_corresponding
               }
 
 
@@ -80,13 +89,22 @@ def remove_ev_rv(rv, ev):
 
 
 def remove_evs(evs, rvli, allevs_spec):
+    """
+    removes events for corresponding rv
+    """
+    eid = evs[0]
+    ev0 = allevs_spec.loc[eid]
+    rvid0 = ev0['Rv']
+
     for eid in evs:
         ev = allevs_spec.loc[eid]
         rvid = ev['Rv']
         if type(rvid) == pd.core.series.Series:
             print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
-            continue
+            rvli.remove(rv)
         rv = rvli.get(rvid)
+        if rvid != rvid0:
+            print('different rvs, should not be if ev + sevs')
         if remove_ev_rv(rv, ev) is False:
             rvli.remove(rv)
 
@@ -100,7 +118,7 @@ def rm_evs_all_rv(evs, rvli, allevs_spec):
                 rvli.remove(rv)
 
 
-def set_tlines_fill_oposite(s, sample_list, allevents_spec):
+def set_tlines_fill_opposite(s, sample_list, allevents_spec):
     """
     - day_evs are all events CREATED on the same day (or later) including sample itself
     - iterate through day events (samples) 1st time:
@@ -119,9 +137,8 @@ def set_tlines_fill_oposite(s, sample_list, allevents_spec):
     rvli = s.rvli
     day_samples = []
     for eid in day_evs:
-        si = sample_list.get(eid)
-        if si is None:  # when samples are sliced in train and test
-            # print('None ev in day evs')
+        si = get_sample(sample_list, eid)
+        if si is None:
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
@@ -141,6 +158,30 @@ def set_tlines_fill_oposite(s, sample_list, allevents_spec):
             rv.tline.loc[str(ev['Start']):str(ev['End'])] = ev['Type']
 
 
+def tlines_zero_corresponding(s, sample_list, allevents_spec):
+    """
+    - day_evs are all events CREATED on the same day (or later) including sample itself
+    - iterate through day events (samples):
+        - delete ev and all connected sevs for corresponding rv of this sample
+        - copy rvlist and assign to next sample
+    - last sample most empty timelines in rvlist
+    - cut to the exact length is after that (in other function)
+    """
+
+    day_evs = s.day_evs  # rendomized only part of it to zero
+
+    rvli = s.rvli
+    for eid in day_evs:
+        si = get_sample(sample_list, eid)
+        if si is None:
+            continue
+        evs = [eid]
+        evs += si.sevs  # can be empty list
+        remove_evs(evs, rvli, allevents_spec)  # should be all same rv
+        rvli = copy.deepcopy(rvli)
+        si.rvli = rvli
+
+
 def set_tlines_fillingup(s, sample_list, allevents_spec):
     """
     - day_evs are all events CREATED on the same day (or later) including sample itself
@@ -155,9 +196,8 @@ def set_tlines_fillingup(s, sample_list, allevents_spec):
 
     rvli = s.rvli
     for eid in day_evs:
-        si = sample_list.get(eid)
-        if si is None:  # when samples are sliced
-            # print('None ev in day evs')
+        si = get_sample(sample_list, eid)
+        if si is None:
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
@@ -171,19 +211,19 @@ def set_tlines_allzeroes(s, sample_list, allevents_spec):
     - day_evs are all events CREATED on the same day (or later
     - delete for each event all connected events for assigned rv
     - rvlist gets more and more zeroes
+    - then assign rvlist to sample
     - rvlist can be copied for all day events and then cut to the exact length
-
     """
     rvli = s.rvli
     evs = []
-    #evs += s.sevs  # can be empty list
+    # evs += s.sevs  # can be empty list
     day_evs = s.day_evs  # rendomized only part of it to zero
-    #evs += day_evs
+    # evs += day_evs
     sample_li = []
 
     for eid in day_evs:
-        ev = sample_list.get(eid)
-        if ev == None:  # when samples are sliced
+        ev = get_sample(sample_list, eid)
+        if ev is None:  # when samples are sliced
             continue
 
         evs += [eid]
@@ -195,3 +235,10 @@ def set_tlines_allzeroes(s, sample_list, allevents_spec):
     # day_evs have same rvli -> exact cutting is in next step
     for s in sample_li:
         s.rvli = copy.deepcopy(rvli)
+
+
+def get_sample(sample_list, eid):
+    s = sample_list.get(eid)
+    if s is None:  # when samples are sliced
+        print('ev not in sample_list; only for events at boundary of timeline', eid)
+    return s

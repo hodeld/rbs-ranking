@@ -101,7 +101,7 @@ if __name__ == '__main__':
         2: baseline,
         3: predictions,  # including train
     }
-    dispatch_fn[3]()
+    dispatch_fn[2]()
 
 
 

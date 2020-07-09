@@ -1,12 +1,13 @@
-from rvranking.globalVars import RELEVANCE, _SAMPLING
+from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE
 from rvranking.dataPrep import *
 from rvranking.logs import hplogger
+
+from rvranking.sampling.samplingClasses import SampleList
+from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
 
 # in colab
 import random
 
-from rvranking.sampling.samplingClasses import SampleList
-from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
 
 
 def get_example_features(s, rvli_d, rvlist_all, sample_list,
@@ -78,7 +79,7 @@ def check_feat(rv, s):
 
 
 def assign_relevance(s):
-    rvs = [s.rv] + list(s.rv_eq)  # correct answer
+    rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
     cnt_relevant_rvs = 0
     for rv in s.rvli:
         if rv.id in rvs:
@@ -91,16 +92,15 @@ def assign_relevance(s):
 
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
                       timelines_spec, rvfirstev_spec, allevents_spec):
+
     def get_list(sample_list):
-        k_er, k_tr, k_rr,  = 0, 0, 0
-        rvli_d = {}
         i = 0
-        sample_list_prep = []
-        nr_rvs_li = []
+        nonlocal k_er, k_tr, k_rr, k_ls
+
         for s in sample_list:
             i += 1
             if not get_timerange(s):
-                k_tr += 1
+                k_tr =+ 1
                 continue
             get_example_features(s, rvli_d, rvlist_all, sample_list,
                                  timelines_spec=timelines_spec,
@@ -115,31 +115,39 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
             if nr_rvs == 0:
                 k_er += 1
                 continue
+            if nr_rvs < _LIST_SIZE:
+                k_ls += 1
             sample_list_prep.append(s)
             nr_rvs_li.append(nr_rvs)
-        if len(sample_list_prep) > 50:
-            hplogger.info('_'.join([mode_name, 'empty rv list: ' + str(k_er)]))
-            hplogger.info('_'.join([mode_name, 'timerange too short: ' + str(k_tr)]))
-            hplogger.info('_'.join([mode_name, 'no relevant rv in rvlist: ' + str(k_rr)]))
-            hplogger.info('_'.join([mode_name, 'mean_rvs: ' + str(sum(nr_rvs_li)/len(nr_rvs_li))]))
-            print('mean_rvs: ', mode_name, str(sum(nr_rvs_li)/len(nr_rvs_li)))
 
-        return sample_list_prep
+    sample_list_s = SampleList(sample_list_all)
+    nr_rvs_li = []
+    rvli_d = {}
+    sample_list_prep = []
+    k_er, k_tr, k_rr, k_ls = 0, 0, 0, 0
+
+    get_list(sample_list_s)
+
+    if len(sample_list_prep) > 50:
+        hplogger.info('empty rv list: ' + str(k_er))
+        hplogger.info('timerange too short: ' + str(k_tr))
+        hplogger.info('0relevantRV: ' + str(k_rr))
+        hplogger.info('mean_rvs: ' + str(sum(nr_rvs_li) / len(nr_rvs_li)))
+        hplogger.info('rvs_tooshort: ' + str(k_ls))
+        print('mean_rvs: ', str(sum(nr_rvs_li) / len(nr_rvs_li)))
+        print('s with nr_rvs<_LIST_SIZE: ', str(k_ls))
 
     orig_list_len = len(sample_list_all)
-    slice_int = int(orig_list_len * train_ratio)
-    random.shuffle(sample_list_all)
-    sample_list_train = SampleList(sample_list_all[:slice_int])
-    sample_list_test = SampleList(sample_list_all[slice_int:])
 
-    mode_name = 'train'
-    s_list_train = get_list(sample_list_train)
-    mode_name = 'test'
-    s_list_test = get_list(sample_list_test)
-    msg = ' '.join(['orig_list_len, train_len, test_list:',
+    slice_int = int(orig_list_len * train_ratio)
+    random.shuffle(sample_list_prep)
+    s_list_train = sample_list_prep[:slice_int]
+    s_list_test = sample_list_prep[slice_int:]
+    msg = ' '.join(['length orig, prep, train, test:',
                     str(orig_list_len),
+                    str(len(sample_list_prep)),
                     str(len(s_list_train)),
-                    str(len(s_list_test))
+                    str(len(s_list_test)),
                     ])
     print(msg)
     hplogger.info(msg)

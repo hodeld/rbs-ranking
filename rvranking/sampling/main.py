@@ -136,14 +136,15 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
         print('s with nr_rvs<_LIST_SIZE: ', str(k_ls))
 
     orig_list_len = len(sample_list_all)
+    prep_list_len = len(sample_list_prep)
 
-    slice_int = int(orig_list_len * train_ratio)
+    slice_int = int(prep_list_len * train_ratio)
     random.shuffle(sample_list_prep)
     s_list_train = sample_list_prep[:slice_int]
     s_list_test = sample_list_prep[slice_int:]
     msg = ' '.join(['length orig, prep, train, test:',
                     str(orig_list_len),
-                    str(len(sample_list_prep)),
+                    str(prep_list_len),
                     str(len(s_list_train)),
                     str(len(s_list_test)),
                     ])

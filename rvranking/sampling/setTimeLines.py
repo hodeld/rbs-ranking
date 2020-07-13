@@ -92,18 +92,27 @@ def cut_timelines(s):
             print('event outside timerange: rv, ist, iet', rv.id, ist, iet)
 
 
-def remove_ev_rv(rv, ev):
+def remove_ev_rv(rv, eid, sample_list, allevs_spec):
+    s = sample_list.get(eid)
+    if s is None:  # sev
+        ev = allevs_spec.loc[eid]
+        st = ev['Start']
+        et = ev['End']
+    else:
+        st = s.start
+        et = s.end  # can be different to ev['End'] if team event
+
     if rv is None:
         return False
     try:
-        rv.tline.loc[str(ev['Start']):str(ev['End'])] = 0
+        rv.tline.loc[str(st):str(et-1)] = 0  # alternative s.start, s.end
     except(KeyError, ValueError) as e:
-        print('event created outside timerange: rv.id, start, end', rv.id, ev['Start'], ev['End'])
+        print('event created outside timerange: rv.id, start, end', rv.id, st, et)
         return False
     return True
 
 
-def remove_evs(evs, rvli, allevs_spec):
+def remove_evs(evs, rvli, sample_list, allevs_spec):
     """
     removes events for corresponding rv
     """
@@ -115,21 +124,20 @@ def remove_evs(evs, rvli, allevs_spec):
         ev = allevs_spec.loc[eid]
         rvid = ev['Rv']
         if type(rvid) == pd.core.series.Series:
-            print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid, ev)
+            print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid)
             rvli.remove(rv)
         rv = rvli.get(rvid)
         if rvid != rvid0:
             print('different rvs, should not be if ev + sevs')
-        if remove_ev_rv(rv, ev) is False:
+        if remove_ev_rv(rv, eid, sample_list, allevs_spec) is False:
             rvli.remove(rv)
 
 
-def rm_evs_all_rv(evs, rvli, allevs_spec):
+def rm_evs_all_rv(evs, rvli, sample_list, allevs_spec):
     for eid in evs:
-        ev = allevs_spec.loc[eid]
         rvli_copy = rvli.copy()
         for rv in rvli_copy:
-            if remove_ev_rv(rv, ev) is False:
+            if remove_ev_rv(rv, eid, sample_list, allevs_spec) is False:
                 rvli.remove(rv)
 
 
@@ -157,7 +165,7 @@ def set_tlines_fill_opposite(s, sample_list, allevents_spec):
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
-        rm_evs_all_rv(evs, rvli, allevents_spec)
+        rm_evs_all_rv(evs, rvli, sample_list, allevents_spec)
         day_samples.append(si)
 
     rvli = copy.deepcopy(rvli)  # as s is not always first sample in day_evs ->
@@ -169,8 +177,17 @@ def set_tlines_fill_opposite(s, sample_list, allevents_spec):
         rvid = si.rv
         rv = rvli.get(rvid)
         for eid in evs:
-            ev = allevents_spec.loc[eid]
-            rv.tline.loc[str(ev['Start']):str(ev['End'])] = ev['Type']
+            if eid == si.id:
+                st = s.start
+                et = s.end
+                evtype = s.evtype
+            else:
+                ev = allevents_spec.loc[eid]
+                st = ev['Start']
+                et = ev['End']
+                evtype = ev['Type']
+
+        rv.tline.loc[str(st):str(et-1)] = evtype
 
 
 def tlines_zero_corresponding(s, sample_list, allevents_spec):
@@ -192,7 +209,7 @@ def tlines_zero_corresponding(s, sample_list, allevents_spec):
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
-        remove_evs(evs, rvli, allevents_spec)  # should be all same rv
+        remove_evs(evs, rvli, sample_list, allevents_spec)  # should be all same rv
         rvli = copy.deepcopy(rvli)
         si.rvli = rvli
 
@@ -216,7 +233,7 @@ def set_tlines_fillingup(s, sample_list, allevents_spec):
             continue
         evs = [eid]
         evs += si.sevs  # can be empty list
-        rm_evs_all_rv(evs, rvli, allevents_spec)
+        rm_evs_all_rv(evs, rvli, sample_list, allevents_spec)
         rvli = copy.deepcopy(rvli)
         si.rvli = rvli
 
@@ -245,7 +262,7 @@ def set_tlines_allzeroes(s, sample_list, allevents_spec):
         evs += ev.sevs
         sample_li.append(ev)
 
-    remove_evs(evs, rvli, allevents_spec)
+    remove_evs(evs, rvli, sample_list, allevents_spec)
 
     # day_evs have same rvli -> exact cutting is in next step
     for s in sample_li:

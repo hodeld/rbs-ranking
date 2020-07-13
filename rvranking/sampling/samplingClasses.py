@@ -25,6 +25,7 @@ class Sample():
         day_evs = get_li(day_evs)
         rv_eq = get_li(rv_eq)
         sevs = get_li(sevs)
+        teams = get_li(teams)
 
         self.location = location
         self.day = (start // 24 * PPH) * (24 * PPH)
@@ -45,6 +46,7 @@ class Sample():
         self.hwx = hwx
         self.uma = uma
         self.rvli = None
+        self.teams = teams
 
     def features(self):
         flist = [

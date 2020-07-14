@@ -105,7 +105,7 @@ def remove_ev_rv(rv, eid, sample_list, allevs_spec):
     if rv is None:
         return False
     try:
-        rv.tline.loc[str(st):str(et-1)] = 0  # alternative s.start, s.end
+        rv.tline.loc[str(st):str(et)] = 0  # alternative s.start, s.end
     except(KeyError, ValueError) as e:
         print('event created outside timerange: rv.id, start, end', rv.id, st, et)
         return False
@@ -187,7 +187,7 @@ def set_tlines_fill_opposite(s, sample_list, allevents_spec):
                 et = ev['End']
                 evtype = ev['Type']
 
-        rv.tline.loc[str(st):str(et-1)] = evtype
+        rv.tline.loc[str(st):str(et)] = evtype
 
 
 def tlines_zero_corresponding(s, sample_list, allevents_spec):

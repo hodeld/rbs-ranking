@@ -1,27 +1,23 @@
-from rvranking.dataPrep import main_path
+from rvranking.dataPrep import main_path, prep_samples, prep_allevents, prep_timelines, get_timelines_raw, \
+    prep_rv_first_ev
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
 import pandas as pd
+import numpy as np
 
 
 def write_testsamples(test_path):
-    timelines_raw = pd.read_csv(main_path + 'timelines_test.csv', index_col=0)  # , header=0)
-    timelines = timelines_raw.drop(index='dt_col')
-    timelines = timelines.apply(pd.to_numeric)
-
-    samples_raw = pd.read_csv(main_path + 'samples_test.csv')
-    samples = samples_raw.iloc[:, 0:16]  # additional columns
+    timelines_raw = get_timelines_raw('timelines_test.csv', ';')
+    timelines = prep_timelines(timelines_raw)
+    samples = prep_samples(file_n='samples_test.csv', sep=';')
+    allevents = prep_allevents('allevents_test.csv')
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
 
-    rvfirstev_raw = pd.read_csv(main_path + 'rvfirstev_test.csv', index_col=0)
-    rvfirstev = rvfirstev_raw.copy()
-    rvfirstev[rvfirstev_raw == 0] = 1
+    rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=',')
 
     rvs = pd.read_csv(main_path + 'RVs_test.csv')
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
-
-    allevents = pd.read_csv(main_path + 'allevents_test.csv', index_col=0)
 
     train_ratio = 0  # all test
     # get rvs, check availability, check evtype, check sex; UMA and HWX not checked yet
@@ -35,3 +31,18 @@ def write_testsamples(test_path):
 
     # write test
     write_context_examples(test_path, sample_list_test)
+
+
+def replace_delimiter():
+    # todo test it -> now different delimiter for timelines
+    def replace(fp, fpn):
+        with open(fp) as f:
+            lines = f.readlines()
+        for l in lines:
+            l.replace(';', ',')
+        with open(fpn) as f:
+            f.writelines(lines)
+
+    fp = main_path + 'timelines_test.csv'
+    new_fp = main_path + 'timelines_test2.csv'
+    replace(fp, new_fp)

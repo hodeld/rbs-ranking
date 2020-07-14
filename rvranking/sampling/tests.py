@@ -21,7 +21,7 @@ class TestSampling(unittest.TestCase):
         for s in sample_list_all[:10]:  # test 10 samples
             rv = s.rv
             tline = timelines.loc[str(rv)]
-            ev_tline_val = tline.loc[str(s.start):str(s.end-1)].values
+            ev_tline_val = tline.loc[str(s.start):str(s.end)].values
             ev = allevents.loc[s.id]
             print('id', s.id)
             if s.teams:

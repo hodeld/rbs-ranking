@@ -4,7 +4,6 @@ from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
 import pandas as pd
-import numpy as np
 
 
 def write_testsamples(test_path):

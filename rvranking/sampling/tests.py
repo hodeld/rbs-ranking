@@ -4,11 +4,6 @@ from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents, prep_samples, get_timelines_raw, \
     prep_timelines, prep_allevents
 
-# START JUPYPTER
-from pathlib import Path
-
-from rvranking.sampling.setTimeLines import get_rvlist_fresh
-
 
 def sample_test(cls, s, tlines, allevs):
     rv = s.rv
@@ -36,7 +31,7 @@ class TestSampling(unittest.TestCase):
         random.shuffle(sample_list_all)
         tlines = timelines
         allevs = allevents
-        for s in sample_list_all[:10]:  # test 10 samples
+        for s in sample_list_all:  # test 10 samples
             sample_test(self, s, tlines, allevs)
 
     def test_prediction_samples(self):
@@ -49,11 +44,6 @@ class TestSampling(unittest.TestCase):
         sample_test(self, s, tlines, allevs)
 
 
-
-
-
-
-
 if __name__ == '__main__':
     unittest.main()
-    print('sampling tests finished)')
+    print('sampling tests finished')

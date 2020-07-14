@@ -53,7 +53,9 @@ def check_availability(rv, s):
     except(KeyError, ValueError) as e:
         print('event created outside timerange: err, start, end', e, s.start, s.end)
         return False
-    if rv.tline.loc[str(s.start):str(s.end)].any():  # not all are 0
+    if rv.tline.loc[str(s.start):str(s.end)].any():  # if not all are 0
+        if rv.id == s.rv:  # that should not be the case:
+            print('sample where rv is not available', s.id, s.rv)
         return False
     else:
         return True
@@ -99,7 +101,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
         for s in sample_list:
             i += 1
             if not get_timerange(s):
-                k_tr =+ 1
+                k_tr += 1
                 continue
             get_example_features(s, rvli_d, rvlist_all, sample_list,
                                  timelines_spec=timelines_spec,
@@ -133,8 +135,12 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
         hplogger.info('0relevantRV: ' + str(k_rr))
         hplogger.info('mean_rvs: ' + str(sum(nr_rvs_li) / len(nr_rvs_li)))
         hplogger.info('rvs_tooshort: ' + str(k_ls))
-        print('mean_rvs: ', str(sum(nr_rvs_li) / len(nr_rvs_li)))
-        print('s with nr_rvs<_LIST_SIZE: ', str(k_ls))
+
+    print('empty rv list: ' + str(k_er))
+    print('timerange too short: ' + str(k_tr))
+    print('0relevantRV: ' + str(k_rr))
+    print('mean_rvs: ', str((sum(nr_rvs_li)+1) / (len(nr_rvs_li)+1)))
+    print('s with nr_rvs<_LIST_SIZE: ', str(k_ls))
 
     orig_list_len = len(sample_list_all)
     prep_list_len = len(sample_list_prep)

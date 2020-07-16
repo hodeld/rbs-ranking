@@ -90,7 +90,7 @@ class RV():
         """concententate
         sex: 1 or 2
         tline: [1 … 20]"""
-        flist = [
+        flist = [  # todo id of rv (as is in rv_ff !!
             self.sex,
             *self.tline,
         ]

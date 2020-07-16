@@ -10,8 +10,9 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   RELEVANCE,
                                   _SAVE_CHECKPOINT_STEPS,
                                   _SAMPLING,
-                                  _LOSS)
-from rvranking.dataPrep import base_store_path, IN_COLAB
+                                  _LOSS,
+                                  change_var)
+from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B
 from rvranking.baseline.rankNaive import rank_rvs
 from rvranking.prediction import make_predictions, get_next_prediction
 
@@ -20,6 +21,31 @@ from rvranking.prediction import make_predictions, get_next_prediction
 import shutil
 
 
+def iterate_samples_train():
+    sample_ids = [13502, 13097]
+    for sid in sample_ids:
+        change_var['sample_id'] = sid
+        print(change_var['sample_nr'])
+        write_elwc()
+        print('finished writing')
+        ranker, train_spec, eval_spec = train_and_eval_fn()
+        shutil.rmtree(_MODEL_DIR, ignore_errors=True)
+        result = tf.estimator.train_and_evaluate(ranker, train_spec, eval_spec)
+        mrr_all = result[0]['metric/MRR@ALL']
+        #if mrr_all < 1:
+        print('sample_id, mrr_all', sid, mrr_all)
+        hplogger.info('sample_id ' + str(sid))
+        hplogger.info('mrr_all: ' + str(mrr_all))
+        hplogger.info('mini-run -------------')
+
+    comment = input('comment on run: ')
+    hyparams = {'iterate_samples_train': True,
+                'sampling method': _SAMPLING,
+                'weeks_b': WEEKS_B,
+                'comment': comment,
+
+                }
+    write_file(hyparams)
 
 
 def main_routine(include_comment=True):
@@ -100,8 +126,9 @@ if __name__ == '__main__':
         1: main_routine,
         2: baseline,
         3: predictions,  # including train
+        4: iterate_samples_train,  # including train
     }
-    dispatch_fn[3]()
+    dispatch_fn[4]()
 
 
 

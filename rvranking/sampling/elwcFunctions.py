@@ -2,7 +2,7 @@ import random
 
 import tensorflow as tf
 from tensorflow_serving.apis import input_pb2
-from rvranking.globalVars import _FAKE
+from rvranking.globalVars import _FAKE_ELWC
 
 # The following functions can be used to convert a value to a type compatible
 # with tf.Example.
@@ -69,7 +69,7 @@ def write_context_examples(path, samples):
         """
         # Create a dictionary mapping the feature name to the tf.Example-compatible
         # data type.
-        if _FAKE:
+        if _FAKE_ELWC:
             feature = {
                 'rv_tokens': _int64_list_feature(rv.features_fake()),  # _RV_FEATURE
                 'relevance': _int64_feature(rv.relevance),  # _LABEL_FEATURE
@@ -106,7 +106,7 @@ def write_context_examples(path, samples):
 
         rvli = s.rvli
         example_list = []
-        if _FAKE:
+        if _FAKE_ELWC:
             #1 is relevant rest is not
             #example = serialize_example_fake(1, [1])
             #example_list.append(example)

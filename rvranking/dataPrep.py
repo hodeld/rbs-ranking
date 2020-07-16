@@ -83,7 +83,7 @@ def get_time_vars(timelines_raw):
     tend = datetime.strptime(timelines_raw.loc['dt_col', '1'], dtform)
     td_seq = (tend - tstart).seconds / 60
     pph = 60 // td_seq
-    weeks_b = 1  # 4 #for cutting timelines
+    weeks_b = .01  # 4 #for cutting timelines
     weeks_a = weeks_b
     kmax = int(timelines_raw.columns[-1])  # last column name as int
     td_perwk = int(pph * 24 * 7)

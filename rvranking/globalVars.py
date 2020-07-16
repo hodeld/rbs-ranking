@@ -1,9 +1,12 @@
 from rvranking.dataPrep import base_store_path
 import tensorflow_ranking as tfr
 # if variable starts with "_" -> cannot imported by import * !
-
+_FAKE_ELWC = False
+_SAME_TEST_TRAIN = True
 _FAKE = False
-#_FAKE = True
+if _FAKE_ELWC or _SAME_TEST_TRAIN:
+    _FAKE = True
+change_var = {'sample_nr': 0}
 
 # all_zero and zero_corresponding: all samples: len(rvs) < 10
 _SAMPLING = 'filling_opposite'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding
@@ -62,7 +65,7 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 # max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 15 * 1000
+_NUM_TRAIN_STEPS = .5 * 1000
 
 #_SAVE_CP_STEPS
 #_SAVE_CHECKPOINT_STEPS = 1000

@@ -81,7 +81,7 @@ def check_feat(rv, s):
 
 
 def assign_relevance(s):
-    rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
+    rvs = [s.rv] # + list(s.rv_eq)  # correct answer; rv_eq without s.rv
     cnt_relevant_rvs = 0
     relevant_rvs = []
     rvli = s.rvli.copy()  # needs to be seperate list with same items to remove items and iterate over!
@@ -153,8 +153,8 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     prep_list_len = len(sample_list_prep)
 
     if _SAME_TEST_TRAIN:
-        s_list_train, s_list_test = iterate_samples_by_nr(sample_list_prep)
-        #s_list_train, s_list_test = iterate_samples_by_id(sample_list_prep)
+        #s_list_train, s_list_test = iterate_samples_by_nr(sample_list_prep)
+        s_list_train, s_list_test = iterate_samples_by_id(sample_list_prep)
     else:
         slice_int = int(prep_list_len * train_ratio)
         random.shuffle(sample_list_prep)

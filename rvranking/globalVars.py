@@ -2,7 +2,7 @@ from rvranking.dataPrep import base_store_path
 import tensorflow_ranking as tfr
 # if variable starts with "_" -> cannot imported by import * !
 _FAKE_ELWC = False
-_SAME_TEST_TRAIN = False
+_SAME_TEST_TRAIN = True
 _FAKE = False
 if _FAKE_ELWC or _SAME_TEST_TRAIN:
     _FAKE = True
@@ -52,8 +52,8 @@ _TEST_DATA_PATH = _BASE_TF_DATA_PATH + "/test.tfrecords"
 _LEARNING_RATE = 0.05
 
 #Loss Function
-#_LOSS = tfr.losses.RankingLossKey.APPROX_MRR_LOSS
-_LOSS = tfr.losses.RankingLossKey.APPROX_NDCG_LOSS
+_LOSS = tfr.losses.RankingLossKey.APPROX_MRR_LOSS
+#_LOSS = tfr.losses.RankingLossKey.APPROX_NDCG_LOSS
 # Parameters to the scoring function. part 2
 #hidden layers: between input and output
 _HIDDEN_LAYER_DIMS = ["64", "32", "16"]

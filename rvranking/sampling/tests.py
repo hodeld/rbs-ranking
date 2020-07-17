@@ -1,8 +1,8 @@
 import random
 import unittest
-from rvranking.sampling.samplingClasses import Sample, RV, RVList
-from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents, prep_samples, get_timelines_raw, \
-    prep_timelines, prep_allevents
+from rvranking.sampling.samplingClasses import Sample
+from rvranking.dataPrep import samples, timelines,  allevents, prep_samples, get_timelines_raw, \
+    prep_timelines, prep_allevents, td_perwk, WEEKS_B, WEEKS_A, KMAX
 
 
 def sample_test(cls, s, tlines, allevs):
@@ -41,6 +41,11 @@ class TestSampling(unittest.TestCase):
         allevs = prep_allevents('allevents_test.csv')
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         s = sample_list_all[0]
+        ist = int(s.start - (td_perwk * WEEKS_B))
+        iet = int(s.start + td_perwk * WEEKS_A)
+        self.assertGreaterEqual(ist, 0)  # ist >= 0
+        self.assertLessEqual(iet, KMAX)
+
         sample_test(self, s, tlines, allevs)
 
 

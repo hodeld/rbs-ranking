@@ -22,8 +22,9 @@ import shutil
 
 
 def iterate_samples_train():
-    sample_ids = [13502, 13097]
+    sample_ids = [16323,]
     for sid in sample_ids:
+    # for i in range(1, 100):
         change_var['sample_id'] = sid
         print(change_var['sample_nr'])
         write_elwc()
@@ -32,8 +33,13 @@ def iterate_samples_train():
         shutil.rmtree(_MODEL_DIR, ignore_errors=True)
         result = tf.estimator.train_and_evaluate(ranker, train_spec, eval_spec)
         mrr_all = result[0]['metric/MRR@ALL']
-        #if mrr_all < 1:
-        print('sample_id, mrr_all', sid, mrr_all)
+        #print('sample_nr, mrr_all', i, mrr_all)
+        if mrr_all < 1:
+            #print('sample_id, mrr_all', sid, mrr_all)
+            #print('sample_nr, mrr_all', i, mrr_all)
+            #hplogger.info('sample_nr mrr<1: ' + str(i))
+            #hplogger.info('sample_id mrr<1: ' + str(sid))
+            break
         hplogger.info('sample_id ' + str(sid))
         hplogger.info('mrr_all: ' + str(mrr_all))
         hplogger.info('mini-run -------------')

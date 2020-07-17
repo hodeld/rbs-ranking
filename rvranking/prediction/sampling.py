@@ -4,6 +4,7 @@ from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
 import pandas as pd
+from rvranking.logs import hplogger
 
 
 def write_testsamples(test_path):
@@ -27,6 +28,11 @@ def write_testsamples(test_path):
                                                             rvfirstev_spec=rvfirstev,
                                                             allevents_spec=allevents
                                                             )
+
+    s0 = sample_list_test[0]
+    rele = [r.relevance for r in s0.rvli]
+    print('rv-relevance', rele)
+    hplogger.info('relevance_list: ' + str(rele))
 
     # write test
     write_context_examples(test_path, sample_list_test)

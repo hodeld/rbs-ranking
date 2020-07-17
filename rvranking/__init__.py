@@ -22,26 +22,32 @@ import shutil
 
 
 def iterate_samples_train():
-    sample_ids = [16323,]
-    for sid in sample_ids:
-    # for i in range(1, 100):
-        change_var['sample_id'] = sid
-        print(change_var['sample_nr'])
+    #sample_ids = [15588,]
+    sid = None
+    i = None
+    for i in range(36, 100):  # for sid in sample_ids: OR for i in range(1, 100):
+        if sid:
+            change_var['sample_id'] = sid
+            s_id_nr = sid
+        else:
+            change_var['sample_nr'] = i
+            s_id_nr = i
         write_elwc()
         print('finished writing')
         ranker, train_spec, eval_spec = train_and_eval_fn()
         shutil.rmtree(_MODEL_DIR, ignore_errors=True)
         result = tf.estimator.train_and_evaluate(ranker, train_spec, eval_spec)
         mrr_all = result[0]['metric/MRR@ALL']
-        #print('sample_nr, mrr_all', i, mrr_all)
-        if mrr_all < 1:
-            #print('sample_id, mrr_all', sid, mrr_all)
-            #print('sample_nr, mrr_all', i, mrr_all)
-            #hplogger.info('sample_nr mrr<1: ' + str(i))
-            #hplogger.info('sample_id mrr<1: ' + str(sid))
-            break
-        hplogger.info('sample_id ' + str(sid))
+        print('s_id_nr, mrr_all', s_id_nr, mrr_all)
+
+        if sid:
+            hplogger.info('sample_id ' + str(sid))
+        else:
+            hplogger.info('sample_nr ' + str(i))
         hplogger.info('mrr_all: ' + str(mrr_all))
+        if mrr_all < 1:
+            print('<1, s_id_nr, mrr_all', s_id_nr, mrr_all)
+            break
         hplogger.info('mini-run -------------')
 
     comment = input('comment on run: ')

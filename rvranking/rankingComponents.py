@@ -1,5 +1,6 @@
 import tensorflow as tf
 import tensorflow_ranking as tfr
+
 from rvranking.dataPrep import RV_TOKEN_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
@@ -176,4 +177,14 @@ def eval_metric_fns():
     metric_fns.update(mrr_d)
 
     return metric_fns
+
+
+def mrr_custom(labels, predictions, features):
+    is_label_valid = tf.reshape(tf.greater_equal(labels, 0.), [-1, 1])
+    clean_labels = tf.boolean_mask(tf.reshape(labels, [-1, 1], is_label_valid))
+    clean_pred = tf.boolean_maks(tf.reshape(predictions, [-1, 1], is_label_valid))
+
+    return tf.metrics.auc(clean_labels, tf.sigmoid(clean_pred), ...)
+    #metric_fns["mrr_custom"] = mrr_custom
+
 

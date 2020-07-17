@@ -6,7 +6,7 @@ _SAME_TEST_TRAIN = True
 _FAKE = False
 if _FAKE_ELWC or _SAME_TEST_TRAIN:
     _FAKE = True
-change_var = {'sample_nr': 0}
+change_var = {'any_variable': 0}
 
 # all_zero and zero_corresponding: all samples: len(rvs) < 10
 _SAMPLING = 'filling_opposite'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding

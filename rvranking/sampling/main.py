@@ -1,7 +1,7 @@
 from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN
 from rvranking.dataPrep import *
 from rvranking.logs import hplogger
-from rvranking.sampling.fakeSampling import iterate_samples_by_id, iterate_samples_by_nr
+from rvranking.sampling.fakeSampling import iterate_samples
 
 from rvranking.sampling.samplingClasses import SampleList
 from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
@@ -153,8 +153,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     prep_list_len = len(sample_list_prep)
 
     if _SAME_TEST_TRAIN:
-        #s_list_train, s_list_test = iterate_samples_by_nr(sample_list_prep)
-        s_list_train, s_list_test = iterate_samples_by_id(sample_list_prep)
+        s_list_train, s_list_test = iterate_samples(sample_list_prep)
     else:
         slice_int = int(prep_list_len * train_ratio)
         random.shuffle(sample_list_prep)

@@ -2,11 +2,14 @@ import os
 from rvranking.dataPrep import log_path
 import logging
 from datetime import datetime
+import tensorflow as tf
 
 from rvranking.logs.key_names import LOG_KEYS
 
 hplogger = logging.getLogger('hyperlogger')
 DATE_FORMAT = '%c'
+
+tf.get_logger().setLevel('ERROR')  # filter INFO and WARNING
 
 
 def logging_basic():

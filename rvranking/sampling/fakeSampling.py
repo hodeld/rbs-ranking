@@ -5,13 +5,21 @@ import pandas as pd
 from rvranking.sampling.samplingClasses import RV
 
 
+def iterate_samples(sample_list_prep):
+    if change_var.get('sample_id', None):
+        s_list_train, s_list_test = iterate_samples_by_id(sample_list_prep)
+    else:
+        s_list_train, s_list_test = iterate_samples_by_nr(sample_list_prep)
+    return s_list_train, s_list_test
+
+
 def iterate_samples_by_id(sample_list_prep):
     sid = change_var['sample_id']
     for s in sample_list_prep:
         if s.id == sid:
             s0 = s
             break
-    s_list_train, s_list_test = get_train_test_fake_sample(s0)
+    s_list_train, s_list_test = get_train_test_real_sample(s0)
     return s_list_train, s_list_test
 
 

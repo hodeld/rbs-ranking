@@ -81,7 +81,7 @@ def check_feat(rv, s):
 
 
 def assign_relevance(s):
-    rvs = [s.rv] # + list(s.rv_eq)  # correct answer; rv_eq without s.rv
+    rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
     cnt_relevant_rvs = 0
     relevant_rvs = []
     rvli = s.rvli.copy()  # needs to be seperate list with same items to remove items and iterate over!

@@ -88,7 +88,7 @@ def get_time_vars(timelines_raw):
     kmax = int(timelines_raw.columns[-1])  # last column name as int
     td_perwk = int(pph * 24 * 7)
     tot_size_tline = int((weeks_b + weeks_a) * td_perwk)
-    rv_feat_len = 1  # rv.sex
+    rv_feat_len = 2  # rv.sex, rv.id
     rv_token_len = rv_feat_len + tot_size_tline + 1  # pandas slice includes 1st value
     print(td_seq, pph, tot_size_tline)
     time_vars = (tstart, tend, td_seq, td_perwk,

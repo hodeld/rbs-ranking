@@ -1,5 +1,7 @@
 import operator
+import random
 
+from rvranking.logs import hplogger
 from rvranking.globalVars import RELEVANCE
 from rvranking.dataPrep import PPH
 
@@ -58,6 +60,15 @@ class Sample():
         ]
         return flist
 
+    def features_fake_random(self):
+        flist = [
+            random.randint(1, 30),
+        ]
+        return flist
+
+
+hplogger.info('event_tokens: ' + 'random.randint(1, 30),')   # evtype, rf_ff, gespever, hwx, uma
+
 
 class SampleList(list):
     '''base class for list of samples'''
@@ -93,7 +104,7 @@ class RV():
         flist = [
             self.id,
             self.sex,
-            *self.tline,
+            # *self.tline,
         ]
         return flist
 
@@ -102,6 +113,17 @@ class RV():
             return [1]
         else:
             return [0]
+
+    def features_fake_random(self):
+        flist = [
+            random.randint(1, 30),
+            random.randint(1, 30),
+            random.randint(1, 30),
+        ]
+        return flist
+
+
+hplogger.info('rv_tokens: ' + 'id, sex')  # self.sex, self.id
 
 
 class RVList(list):

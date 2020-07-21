@@ -1,18 +1,16 @@
 import tensorflow as tf
 import tensorflow_ranking as tfr
-
-from rvranking.dataPrep import RV_TOKEN_LEN
+from rvranking.dataPrep import RV_TLINE_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
                                   _GROUP_SIZE,
                                   _RANK_TOP_NRS)
 
 
-
 #GET_FEATURE
 # input: sparse tensor
-def get_feature_columns(token_len, keyname, default_value=0):
-    default_tensor = [default_value] * token_len
+
+def get_feature_columns(keyname, default_value=0):
 
     sparse_column = tf.feature_column.categorical_column_with_identity(
         key=keyname, num_buckets=1000)
@@ -25,21 +23,15 @@ def get_feature_columns(token_len, keyname, default_value=0):
     return dense_column
 
 
-# return tf.feature_column.numeric_column(key= keyname,
-#                                     shape=(token_len,),
-#                                      dtype=tf.dtypes.int64,
-#                                      default_value=default_tensor)
 def context_feature_columns():
     """Returns context feature names to column definitions."""
-    event_token_len = 5  # evtype, rf_ff, gespever, hwx, uma
-    dense_column = get_feature_columns(event_token_len, 'event_tokens')
+    dense_column = get_feature_columns('event_tokens')
     return {"event_tokens": dense_column}
 
 
 def example_feature_columns():
     """Returns context feature names to column definitions."""
-    rv_token_len = RV_TOKEN_LEN
-    dense_column = get_feature_columns(rv_token_len, _RV_FEATURE)
+    dense_column = get_feature_columns(_RV_FEATURE)
 
     return {"rv_tokens": dense_column}
 

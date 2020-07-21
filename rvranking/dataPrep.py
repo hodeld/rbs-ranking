@@ -88,12 +88,11 @@ def get_time_vars(timelines_raw):
     kmax = int(timelines_raw.columns[-1])  # last column name as int
     td_perwk = int(pph * 24 * 7)
     tot_size_tline = int((weeks_b + weeks_a) * td_perwk)
-    rv_feat_len = 2  # rv.sex, rv.id
-    rv_token_len = rv_feat_len + tot_size_tline + 1  # pandas slice includes 1st value
+    rv_tline_len = tot_size_tline + 1 # pandas slice includes 1st value
     print(td_seq, pph, tot_size_tline)
     time_vars = (tstart, tend, td_seq, td_perwk,
                  pph, weeks_b, weeks_a, kmax,
-                 rv_token_len)
+                 rv_tline_len)
     return time_vars
 
 
@@ -119,7 +118,8 @@ timelines = prep_timelines(timelines_raw)
 
 (tstart, tend, TD_SEQ, td_perwk,
  PPH, WEEKS_B, WEEKS_A,
- KMAX, RV_TOKEN_LEN) = get_time_vars(timelines_raw)
+ KMAX, RV_TLINE_LEN) = get_time_vars(timelines_raw)
+
 
 rvfirstev = prep_rv_first_ev(file_n='rvfirstev.csv', sep=',')
 

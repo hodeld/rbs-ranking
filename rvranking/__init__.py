@@ -11,7 +11,7 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _SAVE_CHECKPOINT_STEPS,
                                   _SAMPLING,
                                   _LOSS,
-                                  change_var)
+                                  change_var, _SHUFFLE_DATASET)
 from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B
 from rvranking.baseline.rankNaive import rank_rvs
 from rvranking.prediction import make_predictions, get_next_prediction
@@ -92,6 +92,7 @@ def main_routine(include_comment=True):
                 'num_train_steps': _NUM_TRAIN_STEPS,
                 'hidden_layers_dims': _HIDDEN_LAYER_DIMS,
                 'save_checkpoint_steps': _SAVE_CHECKPOINT_STEPS,
+                'shuffle_dataset': _SHUFFLE_DATASET,
                 }
     hyparams.update(res_d)
     write_file(hyparams)
@@ -124,11 +125,13 @@ def predictions():
     #ranker.export_saved_model('path', 'serving_inout_receiver_fn')
 
     predicts = make_predictions(ranker)
-    p1 = get_next_prediction(predicts)
-    print(p1)
+    for i in range(0,3):
+
+        pi = get_next_prediction(predicts)
+        print(i, pi)
     comment = input('comment on prediction: ')
     hplogger.info('comment_predict: ' + comment)
-    hplogger.info('predictions: ' + str(p1))
+    hplogger.info('predictions: ' + str(pi))
 
 
 if __name__ == '__main__':
@@ -140,7 +143,7 @@ if __name__ == '__main__':
         3: predictions,  # including train
         4: iterate_samples_train,  # including train
     }
-    dispatch_fn[4]()
+    dispatch_fn[2]()
 
 
 

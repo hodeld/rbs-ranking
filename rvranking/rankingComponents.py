@@ -4,7 +4,7 @@ from rvranking.dataPrep import RV_TLINE_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
                                   _GROUP_SIZE,
-                                  _RANK_TOP_NRS)
+                                  _RANK_TOP_NRS, _SHUFFLE_DATASET)
 
 
 #GET_FEATURE
@@ -55,7 +55,7 @@ def input_fn(path, num_epochs=None):  # num_epochs was: none
         context_feature_spec=context_feature_spec,
         example_feature_spec=example_feature_spec,
         reader=tf.data.TFRecordDataset,
-        shuffle=False,
+        shuffle=_SHUFFLE_DATASET,
         num_epochs=num_epochs)
     features = tf.compat.v1.data.make_one_shot_iterator(dataset).get_next()
     label = tf.squeeze(features.pop(_LABEL_FEATURE), axis=2)

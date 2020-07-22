@@ -49,12 +49,16 @@ class Sample():
         self.uma = uma
         self.rvli = None
         self.teams = teams
-        self.features_attrs = ['evtype', 'rv_ff']  # evtype, rv_ff, gespever, hwx, uma
+        self.features_attrs = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
 
     def features(self):
         f = operator.attrgetter(*self.features_attrs)
-        flist = f(self)
-        return flist
+        res = f(self)
+        if type(res) == tuple:
+            li = list(res)
+        else:
+            li = [res]
+        return li
 
     def features_fake_random(self):
         flist = [
@@ -93,21 +97,21 @@ class RV():
         self.tline = None
         self.prediction = 0
 
-        self.features_attrs = ['id', ]  #  # self.sex, self.id, tline
+        self.features_attrs = ['id', 'sex', 'tline']  #  # self.sex, self.id, tline 'tline'
 
     def features(self):
-        """concententate
+        """concatenate
         sex: 1 or 2
         tline: [1 … 20]"""
         feat_attrs = self.features_attrs
         if 'tline' in feat_attrs:
             feat_attrs.remove('tline')
-            tline = self.tline
+            tline = list(self.tline)  # todo both as series
         else:
             tline = []
         f = operator.attrgetter(*feat_attrs)
         res = f(self)
-        if type(res) == 'tuple':
+        if type(res) == tuple:
             li = list(res)
         else:
             li = [res]

@@ -25,8 +25,24 @@ def get_evtypes(s):
         return anhs
 
 
-def predict_rv(s):
+def predict_rv(s, s_features, rv_features):
     """the higher prio value the lower prio of rv"""
+    def prio_rv_ff():
+        nonlocal prio
+        if 'rv_ff' in s_features and 'id' in rv_features:
+            if rv.id == s.rv_ff:
+                p = -1
+                prio = p
+                return True
+        return False
+
+    def prio_time():
+        nonlocal prio
+        if 'tline' in rv_features:
+            p = prio_masterev(rv, wk_start, wk_end, evs_same_mev)
+            p += prio_freetime(rv, st_range, et_range)
+            prio = p
+
     wk_start, wk_end = get_week_boundaries(s)
     st_range = s.rangestart
     et_range = s.start
@@ -35,11 +51,10 @@ def predict_rv(s):
     rvli = s.rvli
     rv_sort_list = []
     for rv in rvli:
-        if rv.id == s.rv_ff:
-            prio = -1
-        else:
-            prio = prio_masterev(rv, wk_start, wk_end, evs_same_mev)
-            prio += prio_freetime(rv, st_range, et_range)
+        prio = 0
+        if prio_rv_ff() is False:
+            prio_time()
+
         rv_sort_list.append((rv, prio))
     rv_sort_list.sort(key=lambda rv_p: rv_p[1], reverse=False)
 

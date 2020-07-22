@@ -49,15 +49,11 @@ class Sample():
         self.uma = uma
         self.rvli = None
         self.teams = teams
+        self.features_attrs = ['evtype', 'rv_ff']  # evtype, rv_ff, gespever, hwx, uma
 
     def features(self):
-        flist = [
-            self.evtype,
-            self.rv_ff,
-            self.gespever,
-            self.hwx,
-            self.uma,
-        ]
+        f = operator.attrgetter(*self.features_attrs)
+        flist = f(self)
         return flist
 
     def features_fake_random(self):
@@ -66,8 +62,8 @@ class Sample():
         ]
         return flist
 
-
-hplogger.info('event_tokens: ' + 'random.randint(1, 30),')   # evtype, rf_ff, gespever, hwx, uma
+    def log_features(self):
+        hplogger.info('event_tokens: ' + str(self.features_attrs))
 
 
 class SampleList(list):
@@ -97,15 +93,25 @@ class RV():
         self.tline = None
         self.prediction = 0
 
+        self.features_attrs = ['id', ]  #  # self.sex, self.id, tline
+
     def features(self):
         """concententate
         sex: 1 or 2
         tline: [1 … 20]"""
-        flist = [
-            self.id,
-            self.sex,
-            # *self.tline,
-        ]
+        feat_attrs = self.features_attrs
+        if 'tline' in feat_attrs:
+            feat_attrs.remove('tline')
+            tline = self.tline
+        else:
+            tline = []
+        f = operator.attrgetter(*feat_attrs)
+        res = f(self)
+        if type(res) == 'tuple':
+            li = list(res)
+        else:
+            li = [res]
+        flist = li + tline
         return flist
 
     def features_fake(self):
@@ -122,8 +128,8 @@ class RV():
         ]
         return flist
 
-
-hplogger.info('rv_tokens: ' + 'id, sex')  # self.sex, self.id
+    def log_features(self):
+        hplogger.info('rv_tokens: ' + str(self.features_attrs))
 
 
 class RVList(list):

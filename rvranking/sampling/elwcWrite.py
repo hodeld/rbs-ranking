@@ -14,6 +14,11 @@ def write_elwc():
     # needed for get_example_features
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
 
+    s0 = sample_list_all[0]
+    s0.log_features()
+    r0 = rvlist_all[0]
+    r0.log_features()
+
     sample_list_train, sample_list_test = prep_samples_list(sample_list_all,
                                                             rvlist_all,
                                                             train_ratio=0.7,

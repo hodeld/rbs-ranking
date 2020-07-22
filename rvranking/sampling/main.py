@@ -81,7 +81,7 @@ def check_feat(rv, s):
 
 
 def assign_relevance(s):
-    rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
+    rvs = [s.rv] #+ list(s.rv_eq)  # correct answer; rv_eq without s.rv
     cnt_relevant_rvs = 0
     relevant_rvs = []
     rvli = s.rvli.copy()  # needs to be seperate list with same items to remove items and iterate over!
@@ -90,11 +90,12 @@ def assign_relevance(s):
             rv.relevance = RELEVANCE
             cnt_relevant_rvs += 1
             relevant_rvs.append(rv)
-            rvli.remove(rv)  # will be added later
+            s.rvli.remove(rv)  # will be added later
     if cnt_relevant_rvs == 0:
         return False
     int_slice = _LIST_SIZE - cnt_relevant_rvs
-    s.rvli = rvli[:int_slice] + relevant_rvs
+    random.shuffle(s.rvli)
+    s.rvli = s.rvli[:int_slice] + relevant_rvs
     return True
 
 

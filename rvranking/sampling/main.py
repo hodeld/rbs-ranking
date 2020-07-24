@@ -99,6 +99,24 @@ def assign_relevance(s):
     return True
 
 
+def normalize_features(s):
+    # todo randomize tline -> evtype
+    def rvs_random():
+        randint = random.randint(1, 10)  # 1...10
+        s.rv += randint
+        for r in s.rvli:
+            r.id += randint
+
+    def rvs():
+        for i, r in enumerate(s.rvli, 1):
+            if r.id == s.rv:
+                s.rv = i
+            r.id = i
+
+    if 'rv_ff' in s.features_attrs or 'id' in s.rvli[0].features_attrs:
+        rvs()
+
+
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
                       timelines_spec, rvfirstev_spec, allevents_spec):
 
@@ -119,6 +137,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
             if not assign_relevance(s):
                 k_rr += 1
                 continue
+            normalize_features(s)
 
             nr_rvs = len(s.rvli)
             if nr_rvs == 0:

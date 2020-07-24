@@ -60,7 +60,7 @@ def read_samples(test_path, nr_samples):
         label = labs[i, :5].numpy()
         ind_arr = np.where(label == 1)[0]
         ind_highest_ranks.append(ind_arr)
-        print('sample i; first 5 labels', i, label)  # [0. 0. 0. 0. 1.]
-        print('event values', event_t[i].numpy(),)
-        print('rv values of first 5 rvs', rv_t[i, :5, :3].numpy())  # sample 1, first 5 rvs, first 10 features
+        #print('sample i; first 5 labels', i, label)  # [0. 0. 0. 0. 1.]
+        #print('event values', event_t[i].numpy(),)
+        #print('rv values of first 5 rvs', rv_t[i, :5, :3].numpy())  # sample 1, first 5 rvs, first 10 features
     return ind_highest_ranks

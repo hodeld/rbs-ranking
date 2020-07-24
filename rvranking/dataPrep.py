@@ -64,6 +64,26 @@ def prep_allevents(file_n='AllEvents.csv', sep=','):
     return allevents_p
 
 
+def simplify_tlines_notused(timelines_r):
+    dtform = '%Y-%m-%d %H:%M:%S'
+    tst = datetime.strptime(timelines_r.loc['dt_col', '0'], dtform)
+    tet = datetime.strptime(timelines_r.loc['dt_col', '1'], dtform)
+    td_seq = (tst - tet).seconds / 60
+    pph = 60 // td_seq
+    ppd = 24 * pph
+    kmax = int(timelines_r.columns[-1])
+    time_point = 0
+    if tst.weekday() > 4:
+        tdays = 6 - tst.weekday()
+        time_point += tdays * ppd  # 24 or 48h
+    morning = time_point + 8 * pph
+    lunch = morning + 5
+    st = morning
+    et = lunch
+    while et <= kmax:
+        tline = timelines_r.loc[:, str(st):str(et)]
+
+
 def get_timelines_raw(file_n='timelines.csv', sep=','):
     timelines_r = pd.read_csv(main_path + file_n, index_col=0,
                               delimiter=sep)  # , header=0)
@@ -104,11 +124,16 @@ def prep_rv_first_ev(file_n='rvfirstev.csv', sep=','):
     return rvfirstev_p
 
 
+def prep_rv(file_n='RVs.csv', sep=','):
+    rvs_p = pd.read_csv(main_path + file_n, delimiter=sep)
+    return rvs_p
+
+
 main_path = base_get_path + '/alopt_files/'
 
 samples = prep_samples(file_n='Samples.csv', sep=',')
 
-rvs = pd.read_csv(main_path + 'RVs.csv')
+rvs = prep_rv()
 
 allevents = prep_allevents()
 # TIMELINES

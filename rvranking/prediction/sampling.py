@@ -1,5 +1,5 @@
 from rvranking.dataPrep import main_path, prep_samples, prep_allevents, prep_timelines, get_timelines_raw, \
-    prep_rv_first_ev
+    prep_rv_first_ev, prep_rv
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
@@ -14,9 +14,9 @@ def write_testsamples(test_path):
     allevents = prep_allevents('allevents_test.csv')
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
 
-    rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=',')
+    rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')
 
-    rvs = pd.read_csv(main_path + 'RVs_test.csv')
+    rvs = prep_rv('RVs_test.csv',  sep=';')
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
 
     train_ratio = 0  # all test

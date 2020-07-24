@@ -49,7 +49,7 @@ class Sample():
         self.uma = uma
         self.rvli = None
         self.teams = teams
-        self.features_attrs = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
+        self.features_attrs = ['evtype',  ]  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
 
     def features(self):
         f = operator.attrgetter(*self.features_attrs)
@@ -97,7 +97,7 @@ class RV():
         self.tline = None
         self.prediction = 0
 
-        self.features_attrs = ['id', 'sex', 'tline']  #  # self.sex, self.id, tline 'tline'
+        self.features_attrs = ['id', ]  #  # self.sex, self.id, tline 'tline'
 
     def features(self):
         """concatenate

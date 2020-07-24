@@ -1,4 +1,5 @@
 import tensorflow as tf
+import numpy as np
 from rvranking.sampling.elwcWrite import write_elwc
 from rvranking.logs import logging_basic, hplogger, logs_to_csv
 from rvranking.model import train_and_eval_fn
@@ -14,7 +15,7 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   change_var, _SHUFFLE_DATASET)
 from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B
 from rvranking.baseline.rankNaive import rank_rvs
-from rvranking.prediction import make_predictions, get_next_prediction
+from rvranking.prediction import make_predictions
 
 
 # COLAB
@@ -122,16 +123,15 @@ def predictions():
     ranker = 'd'
 
     ranker = main_routine(False)
-    #ranker.export_saved_model('path', 'serving_inout_receiver_fn')
 
-    predicts = make_predictions(ranker)
-    for i in range(0,3):
-
-        pi = get_next_prediction(predicts)
-        print(i, pi)
+    mrrs = make_predictions(ranker)
+    mrrs_arr = np.array(mrrs)
+    mrr_av = mrrs_arr.sum() / len(mrrs_arr)
+    print('mrr_av', mrr_av)
     comment = input('comment on prediction: ')
     hplogger.info('comment_predict: ' + comment)
-    hplogger.info('predictions: ' + str(pi))
+    hplogger.info('mrr_predictions: ' + str(mrrs))
+    hplogger.info('mrr_predictions_av: ' + str(mrr_av))
 
 
 if __name__ == '__main__':
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         3: predictions,  # including train
         4: iterate_samples_train,  # including train
     }
-    dispatch_fn[2]()
+    dispatch_fn[3]()
 
 
 

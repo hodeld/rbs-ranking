@@ -8,7 +8,7 @@ from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents
 def plot_samples():
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
     rvlist_ids = [r[0] for i, r in rvs.iterrows()]
-
+    analyze_rv_ff(sample_list_all)
     #samples_rv = [s.rv for s in sample_list_all]
     samples_evtype = [s.evtype for s in sample_list_all]
     evtypes = list(set(samples_evtype))
@@ -46,9 +46,14 @@ def plot_samples():
     plt.xlabel('RVs')
     plt.ylabel('# Samples')
     plt.xticks(rvlist_ids, rvlist_ids)
-    plt.rcParams.update({'font.size': 8})
     plt.legend(plots, legends)
     plt.show()
+
+
+def analyze_rv_ff(smples):
+    s_rv_ff = [s for s in smples if s.rv_ff == s.rv]
+    ratio_rv_ff = len(s_rv_ff)/len(smples)
+    print('ratio rv = rv_ff', ratio_rv_ff)
 
 
 if __name__ == '__main__':

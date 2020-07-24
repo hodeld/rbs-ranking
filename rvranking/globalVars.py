@@ -37,6 +37,7 @@ _PADDING_LABEL = -1
 
 # Parameters to the scoring function. part 1
 _BATCH_SIZE = 32
+_BATCH_SIZE_PREDICT = _BATCH_SIZE
 
 #following same as in example:
 

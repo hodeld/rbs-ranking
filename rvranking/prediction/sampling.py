@@ -29,13 +29,14 @@ def write_testsamples(test_path):
                                                             allevents_spec=allevents
                                                             )
 
-    s0 = sample_list_test[0]
-    rele = [r.relevance for r in s0.rvli]
-    print('rv-relevance', rele)
-    hplogger.info('relevance_list: ' + str(rele))
-
+    sample_order = []
+    for s in sample_list_test:
+        rele = [r.relevance for r in s.rvli]
+        sample_order.append(s.id)
+    print('sample_order:', sample_order)
     # write test
     write_context_examples(test_path, sample_list_test)
+    return sample_order
 
 
 def replace_delimiter():

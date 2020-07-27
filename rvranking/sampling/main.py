@@ -24,12 +24,12 @@ def get_example_features(s, rvli_d, rvlist_all, sample_list,
 def get_timerange(s):
     weeks_before = WEEKS_B
     weeks_after = WEEKS_A
-    td_perwk = PPH * 24 * 7
-    ist = int(s.start - (td_perwk * weeks_before))
+    TD_PERWK = PPH * 24 * 7
+    ist = int(s.start - (TD_PERWK * weeks_before))
     if ist < 0:
         return False
         # ist = 0
-    iet = int(s.start + td_perwk * weeks_after)
+    iet = int(s.start + TD_PERWK * weeks_after)
     if iet > KMAX:
         # iet = KMAX
         return False

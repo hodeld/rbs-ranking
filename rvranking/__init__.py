@@ -143,7 +143,7 @@ if __name__ == '__main__':
         3: predictions,  # including train
         4: iterate_samples_train,  # including train
     }
-    dispatch_fn[3]()
+    dispatch_fn[1]()
 
 
 

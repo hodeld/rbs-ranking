@@ -1,4 +1,4 @@
-from rvranking.dataPrep import tstart, tend, td_perwk, TD_SEQ
+from rvranking.dataPrep import tstart, tend, TD_PERWK, TD_SEQ
 from rvranking.globalVars import RELEVANCE
 from datetime import timedelta
 
@@ -10,7 +10,7 @@ def get_week_boundaries(s):
 
     wk_start_td_min = (wk_start_td.seconds/60 + wk_start_td.days * 24 * 60)
     wk_start = int(s.start - (wk_start_td_min / TD_SEQ))
-    wk_end = int(wk_start + td_perwk) - 1  # last element of week, pandas slice includes last element
+    wk_end = int(wk_start + TD_PERWK) - 1  # last element of week, pandas slice includes last element
     return wk_start, wk_end
 
 
@@ -78,8 +78,8 @@ def prio_masterev(rv, wk_start, wk_end, evs_same_mev):
     # pandas slice includes last element
     # in eventordering its not sum of time but # of events
     prio = rv.tline.loc[str(wk_start):str(wk_end)].isin(evs_same_mev).sum()
-    wk_b_st = wk_start - td_perwk
-    wk_b_et = wk_end - td_perwk
+    wk_b_st = wk_start - TD_PERWK
+    wk_b_et = wk_end - TD_PERWK
     try:
         prio += .5 * rv.tline.loc[str(wk_b_st):str(wk_b_et)].isin(evs_same_mev).sum()
     except KeyError:  # if week before is not included

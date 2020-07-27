@@ -28,6 +28,7 @@ else:
     INT_N = 'Int64'
     STR_N = 'object'
 
+_TD_PERWK = 2 * 5 # nr or None
 
 def end_c(val):
     val_int = int(val) - 1
@@ -69,7 +70,10 @@ def simplify_tlines_notused(timelines_r):
     tst = datetime.strptime(timelines_r.loc['dt_col', '0'], dtform)
     tet = datetime.strptime(timelines_r.loc['dt_col', '1'], dtform)
     td_seq = (tst - tet).seconds / 60
-    pph = 60 // td_seq
+    if td_seq >= 60:
+        pph = 60 // td_seq
+    else:
+        pph = 60 / td_seq
     ppd = 24 * pph
     kmax = int(timelines_r.columns[-1])
     time_point = 0
@@ -141,10 +145,12 @@ allevents = prep_allevents()
 timelines_raw = get_timelines_raw()
 timelines = prep_timelines(timelines_raw)
 
-(tstart, tend, TD_SEQ, td_perwk,
+(tstart, tend, TD_SEQ, TD_PERWK,
  PPH, WEEKS_B, WEEKS_A,
  KMAX, RV_TLINE_LEN) = get_time_vars(timelines_raw)
 
+if _TD_PERWK:
+    TD_PERWK = _TD_PERWK
 
 rvfirstev = prep_rv_first_ev(file_n='rvfirstev.csv', sep=',')
 

@@ -30,7 +30,7 @@ class Sample():
         teams = get_li(teams)
 
         self.location = location
-        self.day = (start // 24 * PPH) * (24 * PPH)
+        self.day = day
         self.locday = locday
         self.start = start
         self.end = end

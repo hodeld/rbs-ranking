@@ -7,7 +7,7 @@ from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RVList, RV
 from rvranking.globalVars import _TRAIN_DATA_PATH, _RV_FEATURE, _EVENT_FEATURE
 from rvranking.dataPrep import samples, timelines,  allevents, prep_samples, get_timelines_raw, \
-    prep_timelines, prep_allevents, td_perwk, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev
+    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev
 import tensorflow as tf
 
 
@@ -40,15 +40,15 @@ class TestSampling(unittest.TestCase):
         for s in sample_list_all:
             sample_test(self, s, tlines, allevs)
 
-    def test_prediction_samples(self):
+    def _test_prediction_samples(self):
         samples_pred = prep_samples(file_n='samples_test.csv', sep=';')
         timelines_raw = get_timelines_raw('timelines_test.csv', ';')
         tlines = prep_timelines(timelines_raw)
         allevs = prep_allevents('allevents_test.csv')
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         s = sample_list_all[0]
-        ist = int(s.start - (td_perwk * WEEKS_B))
-        iet = int(s.start + td_perwk * WEEKS_A)
+        ist = int(s.start - (TD_PERWK * WEEKS_B))
+        iet = int(s.start + TD_PERWK * WEEKS_A)
         self.assertGreaterEqual(ist, 0)  # ist >= 0
         self.assertLessEqual(iet, KMAX)
 
@@ -67,7 +67,7 @@ class TestSampling(unittest.TestCase):
                                                                 allevents_spec=allevents
                                                                 )
 
-    def test_write_and_input(self):
+    def _test_write_and_input(self):
         # _sampling
         write_elwc()
 

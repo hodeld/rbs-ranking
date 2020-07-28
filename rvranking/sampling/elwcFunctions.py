@@ -2,7 +2,8 @@ import random
 
 import tensorflow as tf
 from tensorflow_serving.apis import input_pb2
-from rvranking.globalVars import _FAKE_ELWC
+from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES
+
 
 # The following functions can be used to convert a value to a type compatible
 # with tf.Example.
@@ -28,6 +29,15 @@ def _int64_feature(value):
 def _int64_list_feature(value):
     """Returns an int64_list from a list of bool / enum / int / uint."""
     return tf.train.Feature(int64_list=tf.train.Int64List(value=value))
+
+
+dispatch_fn = {
+    'evtype': _int64_feature,
+    'rv_ff': _int64_feature,
+    'gespever': _int64_feature,
+    'hwx':_int64_feature,
+    'uma':_int64_feature,
+}
 
 
 def write_context_examples(path, samples):
@@ -86,16 +96,18 @@ def write_context_examples(path, samples):
 
         # Create a dictionary mapping the feature name to the tf.Example-compatible
         # data type.
-        feature = {
-            'event_tokens': _int64_list_feature(contfeatures),
-        }
+        feature = {}
+        for k, val in enumerate(contfeatures):
+            fname = ev_features[k]
+            feature[fname] = dispatch_fn[fname](val)
         # Create a Features message using tf.train.Example.
 
         context = tf.train.Example(features=tf.train.Features(feature=feature))
         return context  # .SerializeToString()
 
     elwc_list = []
-
+    ev_features = _EVENT_FEATURES
+    rv_features = samples[0].rvli[0].features_attrs
     for s in samples:
 
         rvli = s.rvli

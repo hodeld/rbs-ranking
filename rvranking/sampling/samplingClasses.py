@@ -2,7 +2,7 @@ import operator
 import random
 
 from rvranking.logs import hplogger
-from rvranking.globalVars import RELEVANCE
+from rvranking.globalVars import RELEVANCE, _EVENT_FEATURES
 from rvranking.dataPrep import PPH
 
 
@@ -49,10 +49,10 @@ class Sample():
         self.uma = uma
         self.rvli = None
         self.teams = teams
-        self.features_attrs = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
+        #self.features_attrs = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
 
     def features(self):
-        f = operator.attrgetter(*self.features_attrs)
+        f = operator.attrgetter(*_EVENT_FEATURES)
         res = f(self)
         if type(res) == tuple:
             li = list(res)
@@ -65,9 +65,6 @@ class Sample():
             random.randint(1, 30),
         ]
         return flist
-
-    def log_features(self):
-        hplogger.info('event_tokens: ' + str(self.features_attrs))
 
 
 class SampleList(list):

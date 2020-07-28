@@ -4,34 +4,61 @@ from rvranking.dataPrep import RV_TLINE_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
                                   _GROUP_SIZE,
-                                  _RANK_TOP_NRS, _SHUFFLE_DATASET)
+                                  _RANK_TOP_NRS, _SHUFFLE_DATASET, _EVENT_FEATURES)
 
 
 #GET_FEATURE
 # input: sparse tensor
 
-def get_feature_columns(keyname, default_value=0):
+
+def get_feature_columns(keyname, num_buckets=1000, emb_dim=_EMBEDDING_DIMENSION):
 
     sparse_column = tf.feature_column.categorical_column_with_identity(
-        key=keyname, num_buckets=1000)
+        key=keyname, num_buckets=num_buckets)
     # inputs and outputs should be in range [0, num_buckets]
+
     # indicator_column OR embedding_column but embedding gives floats
     ##dense_column = tf.feature_column.indicator_column(sparse_column)
 
     dense_column = tf.feature_column.embedding_column(
-        sparse_column, _EMBEDDING_DIMENSION)
+        sparse_column, emb_dim)
 
     return dense_column
 
 
+def feat_evtype(kname):
+    dense_col = get_feature_columns(kname, num_buckets=25, )  # 25 evtype emb_dim=2
+    return dense_col
+
+
+def feat_rvff(kname):
+    dense_col = get_feature_columns(kname, num_buckets=100, )  # 100 rvs emb_dim=2
+    return dense_col
+
+
+get_feat_fn = {
+    'evtype': feat_evtype,
+    'rv_ff': feat_rvff,
+    'gespever': get_feature_columns,
+    'hwx': get_feature_columns,
+    'uma': get_feature_columns,
+}
+
 def context_feature_columns():
     """Returns context feature names to column definitions."""
-    dense_column = get_feature_columns('event_tokens')
-    return {"event_tokens": dense_column}
+    feature_dict = {}
+    for fname in _EVENT_FEATURES:
+        dense_column = get_feat_fn[fname](fname)
+        feature_dict[fname] = dense_column
+        #feature_cols.append(dense_column)
+
+    #dense_column = get_feature_columns('event_tokens')
+    #return {"event_tokens": dense_column}
+    return feature_dict
 
 
 def example_feature_columns():
-    """Returns context feature names to column definitions."""
+    """Returns example feature names to column definitions."""
     dense_column = get_feature_columns(_RV_FEATURE)
 
     return {"rv_tokens": dense_column}

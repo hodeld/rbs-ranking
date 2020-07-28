@@ -11,7 +11,7 @@ def write_testsamples(test_path):
     timelines_raw = get_timelines_raw('timelines_test.csv', ';')
     timelines = prep_timelines(timelines_raw)
     samples = prep_samples(file_n='samples_test.csv', sep=';')
-    allevents = prep_allevents('allevents_test.csv')
+    allevents = prep_allevents('allevents_test.csv', sep=';')
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
 
     rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')

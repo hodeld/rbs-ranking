@@ -13,26 +13,26 @@ def make_predictions(ranker):
     s_sorted = sorted(s_order)
     indices = [s_order.index(s) for s in s_sorted]
     nr_samples = len(s_order)
-    high_ranked = read_samples(test_path, nr_samples)
+    high_ranked = read_samples(test_path, s_order)
     predictions = ranker.predict(input_fn=lambda: predict_input_fn(test_path))  # = iterator
-    mrrs = eval_prediction(high_ranked, predictions)
+    mrrs = eval_prediction(high_ranked, predictions, s_order)
     assert (len(high_ranked) == len(mrrs))
     for i in indices:
         print('sample ', s_order[i], 'mrr', mrrs[i])
     return mrrs
 
 
-def eval_prediction(high_ranked, predictions):
+def eval_prediction(high_ranked, predictions, s_order):
     mrrs = []
     predicts = []
-    for high_ranks in high_ranked:
+    for i, high_ranks in enumerate(high_ranked):
         try:
             x = next(predictions)
         except StopIteration:
             break
         assert (len(x) == _LIST_SIZE_PREDICT)  ## Note that this includes padding.
         pre = list(x)
-        print('prediction', pre)
+        print('sample / prediction', s_order[i], pre)
         predicts.append(pre)
         pre_sorted = sorted(pre, reverse=True)  # descending
         ranks = [pre_sorted.index(p) + 1 for p in pre]
@@ -47,7 +47,7 @@ def eval_prediction(high_ranked, predictions):
     return mrrs
 
 
-def read_samples(test_path, nr_samples):
+def read_samples(test_path, s_order):
     feat, labs = predict_input_fn(test_path, include_labels=True)  # so each sample once
     print('label', labs.shape)
     for k, item in feat.items():
@@ -56,11 +56,11 @@ def read_samples(test_path, nr_samples):
     rv_t = tf.sparse.to_dense(feat[_RV_FEATURE])
     # print ('indices', query_st.indices[0][0]) #which indix has first value
     ind_highest_ranks = []
-    for i in range(0, nr_samples):
+    for i, si in enumerate(s_order):
         label = labs[i, :5].numpy()
         ind_arr = np.where(label == 1)[0]
         ind_highest_ranks.append(ind_arr)
-        #print('sample i; first 5 labels', i, label)  # [0. 0. 0. 0. 1.]
+        #print('sample id; first 5 labels', si, label)  # [0. 0. 0. 0. 1.]
         #print('event values', event_t[i].numpy(),)
         #print('rv values of first 5 rvs', rv_t[i, :5, :3].numpy())  # sample 1, first 5 rvs, first 10 features
     return ind_highest_ranks

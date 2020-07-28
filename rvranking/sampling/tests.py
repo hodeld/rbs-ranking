@@ -40,11 +40,11 @@ class TestSampling(unittest.TestCase):
         for s in sample_list_all:
             sample_test(self, s, tlines, allevs)
 
-    def _test_prediction_samples(self):
+    def test_prediction_samples(self):
         samples_pred = prep_samples(file_n='samples_test.csv', sep=';')
         timelines_raw = get_timelines_raw('timelines_test.csv', ';')
         tlines = prep_timelines(timelines_raw)
-        allevs = prep_allevents('allevents_test.csv')
+        allevs = prep_allevents('allevents_test.csv', ';')
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         s = sample_list_all[0]
         ist = int(s.start - (TD_PERWK * WEEKS_B))

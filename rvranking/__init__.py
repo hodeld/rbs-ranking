@@ -13,7 +13,7 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _SAMPLING,
                                   _LOSS,
                                   change_var, _SHUFFLE_DATASET)
-from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B
+from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B, TD_PERWK
 from rvranking.baseline.rankNaive import rank_rvs
 from rvranking.prediction import make_predictions
 
@@ -94,6 +94,7 @@ def main_routine(include_comment=True):
                 'hidden_layers_dims': _HIDDEN_LAYER_DIMS,
                 'save_checkpoint_steps': _SAVE_CHECKPOINT_STEPS,
                 'shuffle_dataset': _SHUFFLE_DATASET,
+                'td_perweek': TD_PERWK,
                 }
     hyparams.update(res_d)
     write_file(hyparams)
@@ -143,7 +144,7 @@ if __name__ == '__main__':
         3: predictions,  # including train
         4: iterate_samples_train,  # including train
     }
-    dispatch_fn[1]()
+    dispatch_fn[3]()
 
 
 

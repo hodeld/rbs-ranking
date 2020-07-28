@@ -67,7 +67,7 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 # max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 5 * 1000
+_NUM_TRAIN_STEPS = 25 * 1000
 
 _SHUFFLE_DATASET = True
 

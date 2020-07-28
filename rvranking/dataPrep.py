@@ -30,6 +30,7 @@ else:
 
 _TD_PERWK = 2 * 5 # nr or None
 
+
 def end_c(val):
     val_int = int(val) - 1
     return val_int
@@ -65,29 +66,6 @@ def prep_allevents(file_n='AllEvents.csv', sep=','):
     return allevents_p
 
 
-def simplify_tlines_notused(timelines_r):
-    dtform = '%Y-%m-%d %H:%M:%S'
-    tst = datetime.strptime(timelines_r.loc['dt_col', '0'], dtform)
-    tet = datetime.strptime(timelines_r.loc['dt_col', '1'], dtform)
-    td_seq = (tst - tet).seconds / 60
-    if td_seq >= 60:
-        pph = 60 // td_seq
-    else:
-        pph = 60 / td_seq
-    ppd = 24 * pph
-    kmax = int(timelines_r.columns[-1])
-    time_point = 0
-    if tst.weekday() > 4:
-        tdays = 6 - tst.weekday()
-        time_point += tdays * ppd  # 24 or 48h
-    morning = time_point + 8 * pph
-    lunch = morning + 5
-    st = morning
-    et = lunch
-    while et <= kmax:
-        tline = timelines_r.loc[:, str(st):str(et)]
-
-
 def get_timelines_raw(file_n='timelines.csv', sep=','):
     timelines_r = pd.read_csv(main_path + file_n, index_col=0,
                               delimiter=sep)  # , header=0)
@@ -106,7 +84,10 @@ def get_time_vars(timelines_raw):
     tstart = datetime.strptime(timelines_raw.loc['dt_col', '0'], dtform)
     tend = datetime.strptime(timelines_raw.loc['dt_col', '1'], dtform)
     td_seq = (tend - tstart).seconds / 60
-    pph = 60 // td_seq
+    if td_seq <= 60:
+        pph = 60 // td_seq
+    else:
+        pph = 60 / td_seq
     weeks_b = 1  # 4 #for cutting timelines
     weeks_a = weeks_b
     kmax = int(timelines_raw.columns[-1])  # last column name as int

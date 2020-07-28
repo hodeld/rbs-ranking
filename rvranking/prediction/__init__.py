@@ -12,8 +12,8 @@ def make_predictions(ranker):
     s_order = write_testsamples(test_path)
     s_sorted = sorted(s_order)
     indices = [s_order.index(s) for s in s_sorted]
-    nr_samples = len(s_order)
     high_ranked = read_samples(test_path, s_order)
+    weights(ranker)
     predictions = ranker.predict(input_fn=lambda: predict_input_fn(test_path))  # = iterator
     mrrs = eval_prediction(high_ranked, predictions, s_order)
     assert (len(high_ranked) == len(mrrs))
@@ -64,3 +64,14 @@ def read_samples(test_path, s_order):
         #print('event values', event_t[i].numpy(),)
         #print('rv values of first 5 rvs', rv_t[i, :5, :3].numpy())  # sample 1, first 5 rvs, first 10 features
     return ind_highest_ranks
+
+
+def weights(ranker):
+    # wt_names = ranker.get_variable_names()
+    event_wt_n = 'encoding_layer/event_tokens_embedding/embedding_weights'
+    rv_wt_n = 'encoding_layer/rv_tokens_embedding/embedding_weights'
+
+    event_wts = ranker.get_variable_value(event_wt_n)  # shape: (num_buckets, _EMBEDDING_DIMENSION)
+    rv_wts = ranker.get_variable_value(rv_wt_n)
+    print('event. last step and mean embedding_weights', event_wts[-1], np.mean(event_wts, axis=0))
+    print('rv. last step and mean embedding_weights', rv_wts[-1], np.mean(rv_wts, axis=0))

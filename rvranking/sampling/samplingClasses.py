@@ -97,7 +97,7 @@ class RV():
         self.tline = None
         self.prediction = 0
 
-        self.features_attrs = ['id', 'sex', 'tline']  #  # self.sex, self.id, tline 'tline'
+        self.features_attrs = ['id', 'sex', ]  #  # self.sex, self.id, tline 'tline'
 
     def features(self):
         """concatenate

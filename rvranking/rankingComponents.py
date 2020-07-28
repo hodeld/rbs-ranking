@@ -14,6 +14,7 @@ def get_feature_columns(keyname, default_value=0):
 
     sparse_column = tf.feature_column.categorical_column_with_identity(
         key=keyname, num_buckets=1000)
+    # inputs and outputs should be in range [0, num_buckets]
     # indicator_column OR embedding_column but embedding gives floats
     ##dense_column = tf.feature_column.indicator_column(sparse_column)
 

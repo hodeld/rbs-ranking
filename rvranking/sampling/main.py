@@ -1,5 +1,5 @@
 from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN
-from rvranking.dataPrep import *
+from rvranking.dataPrep import TD_PERWK, WEEKS_A, WEEKS_B, KMAX
 from rvranking.logs import hplogger
 from rvranking.sampling.fakeSampling import iterate_samples
 
@@ -24,7 +24,6 @@ def get_example_features(s, rvli_d, rvlist_all, sample_list,
 def get_timerange(s):
     weeks_before = WEEKS_B
     weeks_after = WEEKS_A
-    TD_PERWK = PPH * 24 * 7
     ist = int(s.start - (TD_PERWK * weeks_before))
     if ist < 0:
         return False
@@ -111,9 +110,12 @@ def normalize_features(s):
         for i, r in enumerate(s.rvli, 1):
             if r.id == s.rv:
                 s.rv = i
+            if r.id == s.rv_ff:
+                s.rv_ff = i
             r.id = i
 
     if 'rv_ff' in s.features_attrs or 'id' in s.rvli[0].features_attrs:
+        random.shuffle(s.rvli)
         rvs()
 
 

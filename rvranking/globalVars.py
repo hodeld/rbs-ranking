@@ -14,7 +14,7 @@ _SAMPLING = 'filling_opposite'  # 'all_zero' OR 'filling_up' OR filling_opposite
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'
-_EMBEDDING_DIMENSION = 20
+_EMBEDDING_DIMENSION = 8
 RELEVANCE = 1
 
 # needed for pre tests example
@@ -67,7 +67,7 @@ _GROUP_SIZE = 1  # Pointwise scoring.
 _MODEL_DIR = base_store_path + "/tmp/ranking_model_dir"
 # max train steps defines nr of epochs (if steps == data size -> 1 epoch)
 #_NUM_TRAIN_STEPS = 15 * 1000
-_NUM_TRAIN_STEPS = 5 * 1000
+_NUM_TRAIN_STEPS = 15 * 1000
 
 _SHUFFLE_DATASET = True
 
@@ -77,4 +77,5 @@ _SAVE_CHECKPOINT_STEPS = 1000
 
 _RANK_TOP_NRS = [1, 2, 5]
 
-_EVENT_FEATURES = ['evtype', 'rv_ff']  # 'evtype', 'rv_ff', 'gespever', 'hwx', 'uma'
+_EVENT_FEATURES = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # 'evtype', 'rv_ff', 'gespever', 'hwx', 'uma'
+_RV_FEATURES = ['id', 'sex', 'tline']  # 'id', 'sex', 'tline'

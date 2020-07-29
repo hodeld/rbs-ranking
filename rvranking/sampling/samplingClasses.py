@@ -2,7 +2,7 @@ import operator
 import random
 
 from rvranking.logs import hplogger
-from rvranking.globalVars import RELEVANCE, _EVENT_FEATURES
+from rvranking.globalVars import RELEVANCE, _EVENT_FEATURES, _RV_FEATURES
 from rvranking.dataPrep import PPH
 
 
@@ -49,7 +49,6 @@ class Sample():
         self.uma = uma
         self.rvli = None
         self.teams = teams
-        #self.features_attrs = ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']  # ['evtype', 'rv_ff', 'gespever', 'hwx', 'uma']
 
     def features(self):
         f = operator.attrgetter(*_EVENT_FEATURES)
@@ -94,26 +93,14 @@ class RV():
         self.tline = None
         self.prediction = 0
 
-        self.features_attrs = ['id', 'sex', ]  #  # self.sex, self.id, tline 'tline'
-
     def features(self):
-        """concatenate
-        sex: 1 or 2
-        tline: [1 … 20]"""
-        feat_attrs = self.features_attrs
-        if 'tline' in feat_attrs:
-            feat_attrs.remove('tline')
-            tline = list(self.tline)  # todo both as series
-        else:
-            tline = []
-        f = operator.attrgetter(*feat_attrs)
+        f = operator.attrgetter(*_RV_FEATURES)
         res = f(self)
         if type(res) == tuple:
             li = list(res)
         else:
             li = [res]
-        flist = li + tline
-        return flist
+        return li
 
     def features_fake(self):
         if self.relevance == RELEVANCE:  # if it is correct rv
@@ -128,10 +115,6 @@ class RV():
             random.randint(1, 30),
         ]
         return flist
-
-    def log_features(self):
-        hplogger.info('rv_tokens: ' + str(self.features_attrs))
-
 
 class RVList(list):
     '''base class for list of rvs'''

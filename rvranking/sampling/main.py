@@ -1,4 +1,4 @@
-from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN, _EVENT_FEATURES
+from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN, _EVENT_FEATURES, _RV_FEATURES
 from rvranking.dataPrep import TD_PERWK, WEEKS_A, WEEKS_B, KMAX
 from rvranking.logs import hplogger
 from rvranking.sampling.fakeSampling import iterate_samples
@@ -114,7 +114,7 @@ def normalize_features(s):
                 s.rv_ff = i
             r.id = i
 
-    if 'rv_ff' in _EVENT_FEATURES or 'id' in s.rvli[0].features_attrs: # s.features_attrs
+    if 'rv_ff' in _EVENT_FEATURES or 'id' in _RV_FEATURES:  # s.features_attrs
         random.shuffle(s.rvli)
         rvs()
 

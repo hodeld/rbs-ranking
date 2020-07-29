@@ -53,7 +53,7 @@ def read_samples(test_path, s_order):
     for k, item in feat.items():
         print('feat', k, item.shape)
     #event_t = tf.sparse.to_dense(feat[_EVENT_FEATURE])  # spare tensor to dense
-    rv_t = tf.sparse.to_dense(feat[_RV_FEATURE])
+    #rv_t = tf.sparse.to_dense(feat[_RV_FEATURE])
     # print ('indices', query_st.indices[0][0]) #which indix has first value
     ind_highest_ranks = []
     for i, si in enumerate(s_order):
@@ -73,16 +73,16 @@ def weights(ranker):
     evtype_n = 'encoding_layer/evtype_embedding/embedding_weights'
     rvff_n = 'encoding_layer/rv_ff_embedding/embedding_weights'
 
-    ev_names = [evtype_n, rvff_n]
-    for ev_n in ev_names:
+    rvid_n = 'encoding_layer/id_embedding/embedding_weights'
+    sex_n = 'encoding_layer/sex_embedding/embedding_weights'
+    tline_n = 'encoding_layer/tline_embedding/embedding_weights'
+
+    f_names = [evtype_n, rvff_n, rvid_n, sex_n, tline_n]
+    print('mean / min / max of all num_buckets:')
+    for f_n in f_names:
         try:
-            wts = ranker.get_variable_value(ev_n)
-            print(ev_n, np.mean(wts, axis=0))
-        except:
+            wts = ranker.get_variable_value(f_n)
+            pr_n = f_n.split('/')[1]
+            print(pr_n, np.mean(wts, axis=0), np.min(wts, axis=0),  np.max(wts, axis=0))
+        except tf.errors.NotFoundError: #Exception as exp:
             pass
-
-
-    #event_wts = ranker.get_variable_value(event_wt_n)  # shape: (num_buckets, _EMBEDDING_DIMENSION)
-    rv_wts = ranker.get_variable_value(rv_wt_n)
-    #print('event. last step and mean embedding_weights', event_wts[-1], np.mean(event_wts, axis=0))
-    print('rv. last step and mean embedding_weights', rv_wts[-1], np.mean(rv_wts, axis=0))

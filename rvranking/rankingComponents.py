@@ -4,7 +4,7 @@ from rvranking.dataPrep import RV_TLINE_LEN
 from rvranking.globalVars import (_EMBEDDING_DIMENSION, _RV_FEATURE, _LABEL_FEATURE,
                                   _PADDING_LABEL, _BATCH_SIZE, _LIST_SIZE, _DROPOUT_RATE, _HIDDEN_LAYER_DIMS,
                                   _GROUP_SIZE,
-                                  _RANK_TOP_NRS, _SHUFFLE_DATASET, _EVENT_FEATURES)
+                                  _RANK_TOP_NRS, _SHUFFLE_DATASET, _EVENT_FEATURES, _RV_FEATURES)
 
 
 #GET_FEATURE
@@ -25,9 +25,9 @@ def get_feature_columns(keyname, num_buckets=1000, emb_dim=_EMBEDDING_DIMENSION)
 
     return dense_column
 
-
+_nr_evtypes = 30
 def feat_evtype(kname):
-    dense_col = get_feature_columns(kname, num_buckets=25, )  # 25 evtype emb_dim=2
+    dense_col = get_feature_columns(kname, num_buckets=_nr_evtypes, )  # 30 evtype emb_dim=2
     return dense_col
 
 
@@ -36,13 +36,33 @@ def feat_rvff(kname):
     return dense_col
 
 
+def feat_bool(kname):
+    dense_col = get_feature_columns(kname, num_buckets=2, )  # 100 rvs emb_dim=2
+    return dense_col
+
+
+def feat_sex(kname):
+    dense_col = get_feature_columns(kname, num_buckets=3, )  # 100 rvs emb_dim=2
+    return dense_col
+
+
+def feat_tline(kname):
+    dense_col = get_feature_columns(kname, num_buckets=_nr_evtypes, emb_dim=20)
+    return dense_col
+
+
 get_feat_fn = {
-    'evtype': feat_evtype,
+    'evtype': feat_evtype,  #  get_feature_columns, #
     'rv_ff': feat_rvff,
-    'gespever': get_feature_columns,
-    'hwx': get_feature_columns,
-    'uma': get_feature_columns,
+    'gespever': feat_sex,
+    'hwx': feat_bool,
+    'uma': feat_bool,
+
+    'sex': feat_sex,
+    'id': feat_rvff,
+    'tline': feat_tline
 }
+
 
 def context_feature_columns():
     """Returns context feature names to column definitions."""
@@ -50,18 +70,16 @@ def context_feature_columns():
     for fname in _EVENT_FEATURES:
         dense_column = get_feat_fn[fname](fname)
         feature_dict[fname] = dense_column
-        #feature_cols.append(dense_column)
-
-    #dense_column = get_feature_columns('event_tokens')
-    #return {"event_tokens": dense_column}
     return feature_dict
 
 
 def example_feature_columns():
     """Returns example feature names to column definitions."""
-    dense_column = get_feature_columns(_RV_FEATURE)
-
-    return {"rv_tokens": dense_column}
+    feature_dict = {}
+    for fname in _RV_FEATURES:
+        dense_column = get_feat_fn[fname](fname)
+        feature_dict[fname] = dense_column
+    return feature_dict
 
 
 # INPUT_FN

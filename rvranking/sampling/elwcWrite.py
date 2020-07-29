@@ -2,7 +2,7 @@ from rvranking.logs import hplogger
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
-from rvranking.globalVars import _TRAIN_DATA_PATH, _TEST_DATA_PATH, _BASE_TF_DATA_PATH, _EVENT_FEATURES
+from rvranking.globalVars import _TRAIN_DATA_PATH, _TEST_DATA_PATH, _BASE_TF_DATA_PATH, _EVENT_FEATURES, _RV_FEATURES
 from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents
 
 # START JUPYPTER
@@ -16,8 +16,7 @@ def write_elwc():
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
 
     hplogger.info('event_tokens: ' + str(_EVENT_FEATURES))
-    r0 = rvlist_all[0]
-    r0.log_features()
+    hplogger.info('rv_tokens: ' + str(_RV_FEATURES))
 
     sample_list_train, sample_list_test = prep_samples_list(sample_list_all,
                                                             rvlist_all,

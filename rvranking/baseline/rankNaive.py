@@ -2,6 +2,7 @@ from rvranking.baseline.priorizeRV import predict_rv
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.dataPrep import samples, rvs, timelines, rvfirstev, allevents
+from rvranking.globalVars import _EVENT_FEATURES, _RV_FEATURES
 
 
 def rank_rvs():
@@ -19,10 +20,8 @@ def rank_rvs():
                                                             )
     ncdg1_li = []
     mrr_li = []
-    s0 = sample_list_test[0]
-    r0 = rvlist_all[0]
-    s_features = s0.features_attrs
-    rv_features = r0.features_attrs
+    s_features = _EVENT_FEATURES
+    rv_features = _RV_FEATURES
 
     for s in sample_list_test:
         ncdg1, mrr = predict_rv(s, s_features, rv_features)  # sets rv.prediction$

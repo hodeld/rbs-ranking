@@ -2,7 +2,7 @@ import random
 
 import tensorflow as tf
 from tensorflow_serving.apis import input_pb2
-from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES
+from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES, _RV_FEATURES
 
 
 # The following functions can be used to convert a value to a type compatible
@@ -37,6 +37,10 @@ dispatch_fn = {
     'gespever': _int64_feature,
     'hwx':_int64_feature,
     'uma':_int64_feature,
+
+    'id': _int64_feature,
+    'sex': _int64_feature,
+    'tline': _int64_list_feature,
 }
 
 
@@ -72,7 +76,7 @@ def write_context_examples(path, samples):
         context = tf.train.Example(features=tf.train.Features(feature=feature))
         return context  # .SerializeToString()
 
-    def serialize_example(rv):
+    def serialize_example():
         """
         Creates a tf.Example message ready to be written to a file.
         concententate: 'rv.feat + rv.tline'
@@ -80,9 +84,12 @@ def write_context_examples(path, samples):
         # Create a dictionary mapping the feature name to the tf.Example-compatible
         # data type.
         feature = {
-            'rv_tokens': _int64_list_feature(rv.features()),  # _RV_FEATURE
             'relevance': _int64_feature(rv.relevance),  # _LABEL_FEATURE
         }
+        for k, val in enumerate(rv.features()):
+            fname = rv_features[k]
+            feature[fname] = dispatch_fn[fname](val)
+
         # Create a Features message using tf.train.Example.
 
         example = tf.train.Example(features=tf.train.Features(feature=feature))
@@ -107,7 +114,7 @@ def write_context_examples(path, samples):
 
     elwc_list = []
     ev_features = _EVENT_FEATURES
-    rv_features = samples[0].rvli[0].features_attrs
+    rv_features = _RV_FEATURES
     for s in samples:
 
         rvli = s.rvli
@@ -130,7 +137,7 @@ def write_context_examples(path, samples):
 
         else:
             for rv in rvli:
-                example = serialize_example(rv)
+                example = serialize_example()
                 example_list.append(example)
             # context = serialize_context(s.features)
             context = serialize_context(s.features())

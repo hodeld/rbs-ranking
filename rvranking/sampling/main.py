@@ -17,6 +17,7 @@ def get_example_features(s, rvli_d, rvlist_all, sample_list,
                       timelines_spec, allevents_spec,
                       rvli_d]
         tline_fn_d[_SAMPLING](tline_vars)
+
     cut_timelines(s)
     get_pot_rvs(s, rvfirstev_spec)
 
@@ -62,7 +63,10 @@ def check_availability(rv, s):
 
 
 def check_evtype(rv, s, rvfirstev_spec):
-    firstev = rvfirstev_spec.loc[rv.id, str(s.evtype)]  # 1, None or date_int
+    try:
+        firstev = rvfirstev_spec.loc[rv.id, str(s.evtype)]  # 1, None or date_int
+    except KeyError:
+        return False
     if firstev == None:
         return False
     if firstev <= s.start:

@@ -4,12 +4,10 @@ from datetime import timedelta
 
 
 def get_week_boundaries(s):
-    st = tstart + timedelta(minutes=s.start * TD_SEQ)
-    wd = st.weekday()
-    wk_start_td = timedelta(days=wd, hours=st.hour, minutes=st.minute)
+    weeks = s.start//TD_PERWK
+    assert tstart.weekday() == 0
 
-    wk_start_td_min = (wk_start_td.seconds/60 + wk_start_td.days * 24 * 60)
-    wk_start = int(s.start - (wk_start_td_min / TD_SEQ))
+    wk_start = weeks * TD_PERWK  #
     wk_end = int(wk_start + TD_PERWK) - 1  # last element of week, pandas slice includes last element
     return wk_start, wk_end
 

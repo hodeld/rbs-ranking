@@ -35,6 +35,15 @@ def tlines_zero_corresponding(tline_vars):
     s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
     tlines_zero_corresponding(s, sample_list, allevents_spec)
 
+
+def zero_relevant_rv(tline_vars):
+    (s, rvlist_all, sample_list,
+     timelines_spec, allevents_spec) = tline_vars[:-1]
+
+    s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
+    allzero_assigned_rv(s, sample_list, allevents_spec)
+
+
 # filling_up:
 # iterates through day evs
 # deletes all ev + sevs for all rvs ev
@@ -50,17 +59,22 @@ def tlines_zero_corresponding(tline_vars):
 # then adds events again for corresp. rv
 # rvlist for last hast most events
 
+# zero_relevant_rv
+# only 0 for target rv in rvlist, other rv "busy"
+
 
 tline_fn_d = {'filling_up': filling_up,
               'filling_opposite': filling_opposite,
               'all_zero': all_zero,  # all events rvlist smaller than 10
-              'zero_corresponding': tlines_zero_corresponding  # all events rvlist smaller than 10
+              'zero_corresponding': tlines_zero_corresponding,  # all events rvlist smaller than 10
+              'zero_relevant_rv': zero_relevant_rv,
               }
 
 
 def get_rvlist_fresh(s, rvlist_all, timelines_spec):
     rvlist = rvlist_all.filter(s.location, 'location')  # [rv for rv in rvs if rv.location == loc_id]
     rvlist = get_rv_timelines(timelines_spec, rvlist)  # same for all same day events
+    rvlist = copy.deepcopy(rvlist)
     return rvlist
 
 
@@ -78,6 +92,7 @@ def get_rvlist_from_dict(s, rvli_d, rvlist_all, timelines_spec):
 def get_rv_timelines(timelines_spec, rvlist):
     for rv in rvlist:
         tline = timelines_spec.loc[str(rv.id)]
+        #rv.tline = tline.copy()
         rv.tline = tline
     return rvlist
 
@@ -267,6 +282,33 @@ def set_tlines_allzeroes(s, sample_list, allevents_spec):
     # day_evs have same rvli -> exact cutting is in next step
     for s in sample_li:
         s.rvli = copy.deepcopy(rvli)
+
+
+def allzero_assigned_rv(s, sample_list, allevents_spec):
+    """
+    - day_evs are all events CREATED on the same day (or later) of sample (target event)
+    - iterate through all day evs and zero out for rv assigned to target event
+    - additional remove target ev + sevs for all rvs
+    - in rvlist of sample relevant rv is much less busy than all others
+    - no copying of rvlist
+    """
+    rvli = s.rvli
+    day_evs = s.day_evs
+    all_evs = []
+    rv = rvli.get(s.rv)
+    for eid in day_evs:
+        ev = get_sample(sample_list, eid)
+        if ev is None:  # when samples are sliced
+            continue
+
+        all_evs += [eid]
+        all_evs += ev.sevs
+
+    for eid in all_evs:
+        remove_ev_rv(rv, eid, sample_list, allevents_spec)
+
+    evs = [s.id] + s.sevs
+    rm_evs_all_rv(evs, rvli, sample_list, allevents_spec)
 
 
 def get_sample(sample_list, eid):

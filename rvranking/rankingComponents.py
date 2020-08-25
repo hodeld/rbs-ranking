@@ -53,11 +53,12 @@ def feat_tline(kname):
 
 get_feat_fn = {
     'evtype': feat_evtype,  # get_feature_columns, #
-    'rv_ff': feat_rvff,
+    #'rv_ff': feat_rvff,
     'gespever': feat_sex,
     'hwx': feat_bool,
     'uma': feat_bool,
 
+    'rv_ff': feat_bool,
     'sex': feat_sex,
     'id': feat_rvff,
     'tline': feat_tline,

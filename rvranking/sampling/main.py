@@ -115,7 +115,8 @@ def normalize_features(s):
             if r.id == s.rv:
                 s.rv = i
             if r.id == s.rv_ff:
-                s.rv_ff = i
+                r.rv_ff = 1
+                #s.rv_ff = i
             r.id = i
 
     if 'rv_ff' in _EVENT_FEATURES or 'id' in _RV_FEATURES:  # s.features_attrs

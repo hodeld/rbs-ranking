@@ -95,6 +95,7 @@ class RV():
         self.tline = None
         self.tline_binary = None
         self.prediction = 0
+        self.rv_ff = 0  # 0 or 1
 
     def features(self):
         f = operator.attrgetter(*_RV_FEATURES)

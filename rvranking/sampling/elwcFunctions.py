@@ -35,12 +35,13 @@ dispatch_fn = {
     'evtype': _int64_feature,
     'rv_ff': _int64_feature,
     'gespever': _int64_feature,
-    'hwx':_int64_feature,
-    'uma':_int64_feature,
+    'hwx': _int64_feature,
+    'uma': _int64_feature,
 
     'id': _int64_feature,
     'sex': _int64_feature,
     'tline': _int64_list_feature,
+    'tline_binary': _int64_list_feature,
 }
 
 

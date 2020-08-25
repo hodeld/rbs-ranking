@@ -1,5 +1,7 @@
 import operator
 import random
+import pandas as pd
+import numpy as np
 
 from rvranking.logs import hplogger
 from rvranking.globalVars import RELEVANCE, _EVENT_FEATURES, _RV_FEATURES
@@ -91,6 +93,7 @@ class RV():
         self.sex = sex
         self.relevance = 0
         self.tline = None
+        self.tline_binary = None
         self.prediction = 0
 
     def features(self):
@@ -100,6 +103,12 @@ class RV():
             li = list(res)
         else:
             li = [res]
+        if 'tline_binary' in _RV_FEATURES:
+            k = _RV_FEATURES.index('tline_binary')
+            bin_tline = self.tline.copy()
+            bin_tline[:] = np.where(self.tline < 1, 0, 1)
+            #newtline = pd.concat([self.tline, bin_tline])
+            li[k] = bin_tline
         return li
 
     def features_fake(self):

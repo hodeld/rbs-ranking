@@ -1,9 +1,9 @@
 from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN, _EVENT_FEATURES, _RV_FEATURES
-from rvranking.dataPrep import TD_PERWK, WEEKS_A, WEEKS_B, KMAX
+from rvranking.dataPrep import TD_PERWK, WEEKS_A, WEEKS_B, KMAX, samples, rvs, timelines, rvfirstev, allevents
 from rvranking.logs import hplogger
 from rvranking.sampling.fakeSampling import iterate_samples
 
-from rvranking.sampling.samplingClasses import SampleList
+from rvranking.sampling.samplingClasses import SampleList, Sample, RVList, RV
 from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
 
 # in colab
@@ -195,3 +195,23 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     print(msg)
     hplogger.info(msg)
     return s_list_train, s_list_test
+
+
+def get_train_test():
+    sample_list_all = [Sample(s) for i, s in samples.iterrows()]  # samples.iloc[:5].iterrows()])
+
+    # needed for get_example_features
+    rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
+
+    hplogger.info('event_tokens: ' + str(_EVENT_FEATURES))
+    hplogger.info('rv_tokens: ' + str(_RV_FEATURES))
+
+    sample_list_train, sample_list_test = prep_samples_list(sample_list_all,
+                                                            rvlist_all,
+                                                            train_ratio=0.7,
+                                                            timelines_spec=timelines,
+                                                            rvfirstev_spec=rvfirstev,
+                                                            allevents_spec=allevents
+                                                            )
+
+    return sample_list_train, sample_list_test

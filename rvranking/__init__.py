@@ -134,6 +134,9 @@ def predictions():
     hplogger.info('mrr_predictions: ' + str(mrrs))
     hplogger.info('mrr_predictions_av: ' + str(mrr_av))
 
+def scikit_main():
+    get_data()
+
 
 if __name__ == '__main__':
     logging_basic()
@@ -143,6 +146,7 @@ if __name__ == '__main__':
         2: baseline,
         3: predictions,  # including train
         4: iterate_samples_train,  # including train
+        5: scikit_main,
     }
     dispatch_fn[3]()
 

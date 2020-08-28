@@ -21,6 +21,8 @@ from rvranking.prediction import make_predictions
 # COLAB
 import shutil
 
+from rvranking.scikit_algos.main import fit_predict
+
 
 def iterate_samples_train():
     #sample_ids = [15588,]
@@ -134,8 +136,9 @@ def predictions():
     hplogger.info('mrr_predictions: ' + str(mrrs))
     hplogger.info('mrr_predictions_av: ' + str(mrr_av))
 
+
 def scikit_main():
-    get_data()
+    fit_predict()
 
 
 if __name__ == '__main__':
@@ -148,7 +151,7 @@ if __name__ == '__main__':
         4: iterate_samples_train,  # including train
         5: scikit_main,
     }
-    dispatch_fn[3]()
+    dispatch_fn[5]()
 
 
 

@@ -114,6 +114,16 @@ def prep_rv(file_n='RVs.csv', sep=','):
     return rvs_p
 
 
+def get_evtypes(file_n='EventType.csv', sep=','):
+    evtypes_raw = pd.read_csv(main_path + file_n,
+                              delimiter=sep)
+
+    evtypes = evtypes_raw.iloc[:, 0:1]  # additional columns
+    ev_min = evtypes.min()[0]
+    ev_max = evtypes.max()[0]
+    return ev_min, ev_max
+
+
 main_path = base_get_path + '/alopt_files/'
 
 samples = prep_samples(file_n='Samples.csv', sep=',')
@@ -122,7 +132,7 @@ rvs = prep_rv()
 
 allevents = prep_allevents()
 # TIMELINES
-
+MIN_ID, MAX_ID = get_evtypes()
 timelines_raw = get_timelines_raw()
 timelines = prep_timelines(timelines_raw)
 

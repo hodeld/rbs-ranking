@@ -7,8 +7,10 @@ from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES, _RV_FEATURES
 def get_data():
     sample_list_train, sample_list_test = get_train_test()
 
-    x_train, y_train = toTensor(sample_list_train)
-    x_test, y_test = toTensor(sample_list_test)
+    #x_train, y_train = toTensor(sample_list_train)
+    #x_test, y_test = toTensor(sample_list_test)
+    x_train, y_train = to_data_frame(sample_list_train)
+    x_test, y_test = to_data_frame(sample_list_test)
 
     return x_train, y_train, x_test, y_test
 
@@ -31,7 +33,7 @@ def toTensor(s_list):
                 f_arr = pd.Series(f, dtype='int')
             except ValueError:
                 f_arr = pd.Series([f], dtype='int')
-            feat_arr = pd.concat([feat_arr, f_arr])
+            feat_arr = pd.concat([feat_arr, f_arr], ignore_index=True)
         return feat_arr
 
     labels = []
@@ -49,29 +51,60 @@ def toTensor(s_list):
     return feat_matrix, labels
 
 
-def toDFwColumsn(s_list):
+def to_data_frame(s_list):
     """
     :param s_list: list of samples with rvs
     :return:
     problem: df should only of nr not series (as tline)
     """
 
+    def ext_features(obj):
+        """
+        :param obj:
+        :return: list of features -> for dataframe
+        """
+        feat_arr = []
+        feat_list = obj.features()
+        for f in feat_list:
+            try:
+                f_arr = list(f)
+            except TypeError:
+                f_arr = [f]
+            feat_arr.extend(f_arr)
+        return feat_arr
+
+    def get_rv_feat_cols(obj, feat_names):
+        feat_list = obj.features()
+        col_names = []
+        for f, n in zip(feat_list, feat_names) :
+            try:
+                f_arr = pd.Series(f, dtype='int')
+                li = list(range(f_arr.size))
+                f_cols = [n + str(i) for i in li]
+            except ValueError:
+                f_cols = [n]
+            col_names.extend(f_cols)
+        return col_names
+
     ev_features = _EVENT_FEATURES
     rv_features = _RV_FEATURES
-    all_feat_names = ev_features + rv_features
+    rv0 = s_list[0].rvli[0]
+    rv_cols = get_rv_feat_cols(rv0, rv_features)
+
+    all_feat_names = rv_cols + ev_features
 
     labels = []
     tot_feat_list = []
     for s in s_list:
         rvli = s.rvli
-        s_feat_li = s.features()
+        s_feat_arr = ext_features(s)
 
         for rv in rvli:
-            rv_feat_li = rv.features()
-            rv_feat_li.extend(s_feat_li) #  len == nr of tot features
-            tot_feat_list.append(rv_feat_li)
+            rv_feat_arr = ext_features(rv)
+            rv_feat_arr.extend(s_feat_arr)
+            tot_feat_list.append(rv_feat_arr)
             labels.append(rv.relevance)
-    feat_matrix = pd.DataFrame(tot_feat_list, columns=all_feat_names)
+    feat_matrix = pd.DataFrame(tot_feat_list, columns=all_feat_names, dtype='int')
 
     return feat_matrix, labels
 

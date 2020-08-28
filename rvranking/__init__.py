@@ -139,6 +139,15 @@ def predictions():
 
 def scikit_main():
     fit_predict()
+    comment = input('comment on prediction: ')
+    hplogger.info('comment_predict: ' + comment)
+    hyparams = {'comment': comment,
+                'fake': _FAKE,
+                'sampling method': _SAMPLING,
+                'relevance': RELEVANCE,
+                'td_perweek': TD_PERWK,
+                }
+    write_file(hyparams)
 
 
 if __name__ == '__main__':

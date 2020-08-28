@@ -7,7 +7,7 @@ import pandas as pd
 from rvranking.logs import hplogger
 
 
-def write_testsamples(test_path):
+def get_test_samples():
     timelines_raw = get_timelines_raw('timelines_test.csv', ';')
     timelines = prep_timelines(timelines_raw)
     samples = prep_samples(file_n='samples_test.csv', sep=';')
@@ -16,7 +16,7 @@ def write_testsamples(test_path):
 
     rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')
 
-    rvs = prep_rv('RVs_test.csv',  sep=';')
+    rvs = prep_rv('RVs_test.csv', sep=';')
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
 
     train_ratio = 0  # all test
@@ -34,6 +34,13 @@ def write_testsamples(test_path):
         rele = [r.relevance for r in s.rvli]
         sample_order.append(s.id)
     print('sample_order:', sample_order)
+
+    return sample_list_test, sample_order
+
+
+def write_testsamples(test_path):
+    sample_list_test, sample_order = get_test_samples()
+
     # write test
     write_context_examples(test_path, sample_list_test)
     return sample_order

@@ -44,7 +44,7 @@ def prep_samples(file_n='Samples.csv', sep=','):
         'Id': INT_N,
         'Location': INT_N,
         'Start': INT_N,
-        # 'End': INT_N,
+        'Rv added': INT_N,
         'Day evs': STR_N,
         'Teams': STR_N,
         'Sevs': STR_N,
@@ -55,7 +55,7 @@ def prep_samples(file_n='Samples.csv', sep=','):
                               delimiter=sep,
                               dtype=dtype_dict,
                               converters=CONV)
-    samples = samples_raw.iloc[:, 0:17]  # additional columns
+    samples = samples_raw.iloc[:, 0:18]  # additional columns
     return samples
 
 

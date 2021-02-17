@@ -13,7 +13,8 @@ class Sample():
 
     def __init__(self, sample_li):
         (s_id, location, dbid, day_evs, sevs, rv_eq,
-         start, end, rv, group, cat,
+         start, end, rv, rv_added,
+         group, cat,
          evtype, rv_ff, gespever, hwx, uma, teams) = sample_li
 
         day = int(start // (24 * PPH) * (24 * PPH))
@@ -39,6 +40,7 @@ class Sample():
         self.rangestart = 0
         self.rangeend = 0
         self.rv = rv
+        self.rv_added = rv_added
         self.rv_eq = rv_eq
         self.id = s_id
         self.evtype = evtype

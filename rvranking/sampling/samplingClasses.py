@@ -128,6 +128,7 @@ class RV():
         ]
         return flist
 
+
 class RVList(list):
     '''base class for list of rvs'''
 

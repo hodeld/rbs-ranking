@@ -57,7 +57,6 @@ def fit_predict():
     x_pred, y_pred = x_y_data(sample_list_pred)
     mrr_mean, mrrs = score_per_event(pipe, x_pred, y_pred, _LIST_SIZE)
 
-
     s_sorted = sorted(s_order)
     indices = [s_order.index(s) for s in s_sorted]
     pred_in_order = []
@@ -81,14 +80,14 @@ def score_per_event(pipe, x, y, rvli_size):
     classes = list(pipe.named_steps['randomforestclassifier'].classes_)
     rel_rv_ind = classes.index(1)
     proba_rel = list(prob_arr[:, rel_rv_ind])
-    kst = 0
+    kst = 0 #iterate start number
     mrrs = []
     evs = int(len(proba_rel)/rvli_size)
     for ev in range(evs):
         ket = kst + rvli_size
         rv_sort_list = []
         label_i = y[kst:ket]
-        indeces_rv = [i for i, n in enumerate(label_i) if n == 1]
+        indeces_rv = [i for i, n in enumerate(label_i) if n == 1] #positions where label_i == 1
         rv_probs = proba_rel[kst:ket]
         for ind, prob in enumerate(rv_probs):
             rv_sort_list.append((ind, prob))

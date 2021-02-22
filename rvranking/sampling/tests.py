@@ -6,8 +6,8 @@ from rvranking.sampling.elwcWrite import write_elwc
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RVList, RV
 from rvranking.globalVars import _TRAIN_DATA_PATH, _RV_FEATURE, _EVENT_FEATURE
-from rvranking.dataPrep import samples, timelines,  allevents, prep_samples, get_timelines_raw, \
-    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev
+from rvranking.dataPrep import samples, timelines, allevents, prep_samples, get_timelines_raw, \
+    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev, get_test_files
 import tensorflow as tf
 
 
@@ -26,7 +26,7 @@ def sample_test(cls, s, tlines, allevs):
     cls.assertEqual(ev['Type'], s.evtype)
     cls.assertEqual(ev['Rv added'], s.rv_added)
     evtype = s.evtype
-    print('id', 'evtype', 'tline', evtype, s.id, ev_tline_val)
+    print('id', 'evtype', 'tline', s.id, evtype, ev_tline_val)
     cls.assertEqual((evtype == ev_tline_val).all(), True)
     print(s.id)
 
@@ -42,18 +42,15 @@ class TestSampling(unittest.TestCase):
             sample_test(self, s, tlines, allevs)
 
     def test_prediction_samples(self):
-        samples_pred = prep_samples(file_n='samples_test.csv', sep=',')
-        timelines_raw = get_timelines_raw('timelines_test.csv', ',')
-        tlines = prep_timelines(timelines_raw)
-        allevs = prep_allevents('allevents_test.csv', ',')
+        samples_pred, tlines, allevs = get_test_files()
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         s = sample_list_all[0]
         ist = int(s.start - (TD_PERWK * WEEKS_B))
         iet = int(s.start + TD_PERWK * WEEKS_A)
         self.assertGreaterEqual(ist, 0)  # ist >= 0
         self.assertLessEqual(iet, KMAX)
-
-        sample_test(self, s, tlines, allevs)
+        for s in sample_list_all:
+            sample_test(self, s, tlines, allevs)
 
     def _sampling(self):
         sample_list_all = [Sample(s) for i, s in samples.iloc[:5].iterrows()]

@@ -38,6 +38,14 @@ def get_timerange(s):
     return True
 
 
+def same_location(s, rvlist):
+    rv = rvlist.get(s.rv, 'id')
+    if s.location == rv.location:
+        return True
+    else:
+        return False
+
+
 def get_pot_rvs(s, rvfirstev_spec):
     rvlist = s.rvli.copy() # needs to be seperate list with same items to remove items and iterate over!
     for rv in rvlist:
@@ -129,13 +137,17 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
 
     def get_list(sample_list):
         i = 0
-        nonlocal k_er, k_tr, k_rr, k_ls
+        nonlocal k_er, k_tr, k_rr, k_ls, k_loc
 
         for s in sample_list:
             i += 1
             if not get_timerange(s):
                 k_tr += 1
                 continue
+            if not same_location(s, rvlist_all):
+                k_loc += 1
+                continue
+
             get_example_features(s, rvli_d, rvlist_all, sample_list,
                                  timelines_spec=timelines_spec,
                                  rvfirstev_spec=rvfirstev_spec,
@@ -159,7 +171,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     nr_rvs_li = []
     rvli_d = {}
     sample_list_prep = []
-    k_er, k_tr, k_rr, k_ls = 0, 0, 0, 0
+    k_er, k_tr, k_rr, k_ls, k_loc = 0, 0, 0, 0, 0
 
     get_list(sample_list_s)
 
@@ -169,6 +181,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
         hplogger.info('0relevantRV: ' + str(k_rr))
         hplogger.info('mean_rvs: ' + str(sum(nr_rvs_li) / len(nr_rvs_li)))
         hplogger.info('rvs_tooshort: ' + str(k_ls))
+        print('rv and sample not same location count', k_loc)
 
     print('empty rv list: ' + str(k_er))
     print('timerange too short: ' + str(k_tr))

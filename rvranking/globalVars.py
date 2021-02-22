@@ -10,7 +10,8 @@ if _FAKE_ELWC or _SAME_TEST_TRAIN:
 change_var = {'any_variable': 0}
 
 # all_zero and zero_corresponding: all samples: len(rvs) < 10
-_SAMPLING = 'filling_opposite'  # 'all_zero' OR 'filling_up' OR filling_opposite OR 'zero_corresponding OR  zero_relevant_rv
+_SAMPLING = 'acc_added_rv'   # 'acc_added_rv' OR 'all_zero' OR 'filling_up' OR filling_opposite OR
+                                                # 'zero_corresponding OR  zero_relevant_rv
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'

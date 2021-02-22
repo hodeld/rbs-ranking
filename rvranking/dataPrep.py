@@ -124,6 +124,14 @@ def get_evtypes(file_n='EventType.csv', sep=','):
     return ev_min, ev_max
 
 
+def get_test_files():
+    samples_pred = prep_samples(file_n='samples_test.csv', sep=',')
+    timelines_raw = get_timelines_raw('timelines_test.csv', ',')
+    tlines = prep_timelines(timelines_raw)
+    allevs = prep_allevents('allevents_test.csv', ',')
+    return samples_pred, tlines, allevs
+
+
 main_path = base_get_path + '/alopt_files/'
 
 samples = prep_samples(file_n='Samples.csv', sep=',')

@@ -7,7 +7,7 @@ from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES, _RV_FEATURES
 def get_data():
     sample_list_train, sample_list_test = get_train_test()
 
-    x_train, y_train = x_y_data(sample_list_train)
+    x_train, y_train, f_per_s_train = x_y_data(sample_list_train)
     x_test, y_test = x_y_data(sample_list_test)
 
     return x_train, y_train, x_test, y_test
@@ -17,7 +17,6 @@ def x_y_data(sample_list):
     # x_train, y_train = toTensor(sample_list)
     x, y = to_data_frame(sample_list)
     return x, y
-
 
 
 def toTensor(s_list):

@@ -1,5 +1,5 @@
 from rvranking.dataPrep import main_path, prep_samples, prep_allevents, prep_timelines, get_timelines_raw, \
-    prep_rv_first_ev, prep_rv
+    prep_rv_first_ev, prep_rv, get_test_files
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RV, RVList
 from rvranking.sampling.elwcFunctions import write_context_examples
@@ -8,10 +8,7 @@ from rvranking.logs import hplogger
 
 
 def get_test_samples():
-    timelines_raw = get_timelines_raw('timelines_test.csv', ';')
-    timelines = prep_timelines(timelines_raw)
-    samples = prep_samples(file_n='samples_test.csv', sep=';')
-    allevents = prep_allevents('allevents_test.csv', sep=';')
+    samples, timelines, allevents = get_test_files()
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
 
     rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')

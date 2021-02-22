@@ -1,6 +1,9 @@
 import copy
 
 import pandas as pd
+import numpy as np
+
+from rvranking.dataPrep import PPH, KMAX
 
 
 def filling_up(tline_vars):
@@ -44,6 +47,14 @@ def zero_relevant_rv(tline_vars):
     allzero_assigned_rv(s, sample_list, allevents_spec)
 
 
+def acc_added_rv(tline_vars):
+    (s, rvlist_all, sample_list,
+     timelines_spec, allevents_spec) = tline_vars[:-1]
+
+    s.rvli = get_rvlist_fresh(s, rvlist_all, timelines_spec)
+    according_added_rv(s, sample_list, allevents_spec)
+
+
 # filling_up:
 # iterates through day evs
 # deletes all ev + sevs for all rvs ev
@@ -62,12 +73,17 @@ def zero_relevant_rv(tline_vars):
 # zero_relevant_rv
 # only 0 for target rv in rvlist, other rv "busy"
 
+# acc_added_rv
+# takes moment when rv added to sample
+# zeroes out all events which have a rv_added later that this
+# should show realistic 'picture'
 
 tline_fn_d = {'filling_up': filling_up,
               'filling_opposite': filling_opposite,
               'all_zero': all_zero,  # all events rvlist smaller than 10
               'zero_corresponding': tlines_zero_corresponding,  # all events rvlist smaller than 10
               'zero_relevant_rv': zero_relevant_rv,
+              'acc_added_rv': acc_added_rv,
               }
 
 
@@ -75,6 +91,8 @@ def get_rvlist_fresh(s, rvlist_all, timelines_spec):
     rvlist = rvlist_all.filter(s.location, 'location')  # [rv for rv in rvs if rv.location == loc_id]
     rvlist = get_rv_timelines(timelines_spec, rvlist)  # same for all same day events
     rvlist = copy.deepcopy(rvlist)
+    if len(rvlist) == 0:
+        print('rvlist == 0 for sample id', s.id)
     return rvlist
 
 
@@ -138,13 +156,19 @@ def remove_evs(evs, rvli, sample_list, allevs_spec):
     for eid in evs:
         ev = allevs_spec.loc[eid]
         rvid = ev['Rv']
+        rv = rvli.get(rvid)
+        if rv is None:
+            print('rvid is not in rvli', rvid)
+            continue
         if type(rvid) == pd.core.series.Series:
             print('series err, rvid, eid, ev -> due to 2 gs in one event', rvid, eid)
             rvli.remove(rv)
-        rv = rvli.get(rvid)
+
         if rvid != rvid0:
-            print('different rvs, should not be if ev + sevs')
+            pass
+            #print('different rvs, should not be if ev + sevs')
         if remove_ev_rv(rv, eid, sample_list, allevs_spec) is False:
+            print('rvremoved', rvid)
             rvli.remove(rv)
 
 
@@ -311,8 +335,47 @@ def allzero_assigned_rv(s, sample_list, allevents_spec):
     rm_evs_all_rv(evs, rvli, sample_list, allevents_spec)
 
 
+def according_added_rv(s, sample_list, allevents_spec):
+    """
+       - added_rv: when rv added to sample
+       - zero out in target ev + sevs
+       - zero out in all evs + sevs which have rv_added later than rv_added of target ev
+       - no copying of rvlist
+       """
+    rvli = s.rvli
+    rv_added = s.rv_added
+    #get Ids of events
+    oneday = PPH * 24
+    range_start = int(s.rangestart - oneday)
+    if range_start < 0:
+        range_start = 0
+    range_end = int(s.rangeend + oneday)
+    if range_end > KMAX:
+        range_end = KMAX
+
+    idx = np.where((allevents_spec['Start'] >= range_start) & (allevents_spec['End'] <= range_end))
+    evs_range = allevents_spec.iloc[idx]
+
+    all_evs = evs_range[evs_range['Rv added'] >= rv_added]
+    ev_ids = all_evs.index.values.tolist()
+    assert s.id in ev_ids
+    sample_li = []
+    evs = []
+    for eid, row in all_evs.iterrows():  #index and row
+        evs += [eid]
+        if row['Group'] == 3:
+            ev = get_sample(sample_list, eid)
+            if ev is None:  # when samples are sliced
+                continue
+            sample_li.append(ev)
+            evs += ev.sevs
+
+    remove_evs(evs, rvli, sample_list, allevents_spec)
+
+
 def get_sample(sample_list, eid):
     s = sample_list.get(eid)
     if s is None:  #  -> are still in allevents
-        print('ev not in sample_list; -> why?; eid:', eid)
+        pass
+        #print('ev not in sample_list; -> why? -> location?; or a team-event? eid:', eid)
     return s

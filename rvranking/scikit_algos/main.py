@@ -34,7 +34,7 @@ transf_dict = {
 
 
 def fit_predict():
-    x_train, y_train, x_test, y_test = get_data() # uma and hwx are objects
+    x_train, y_train, xy_train, x_test, y_test, xy_test = get_data()  # uma and hwx are objects
     clf = RandomForestClassifier(random_state=0)
 
     tfr_name = 'column'
@@ -50,12 +50,12 @@ def fit_predict():
     hplogger.info('named_steps: ' + str(list(pipe.named_steps.keys())))
     hplogger.info('acc_sc: ' + str(acc_sc))
 
-    mrr_mean, mrrs= score_per_event(pipe, x_test, y_test, _LIST_SIZE)
+    mrr_mean, mrrs = score_per_event(pipe, x_test, xy_test)
     hplogger.info('mrr_mean: ' + str(mrr_mean))
 
     sample_list_pred, s_order = get_test_samples()
-    x_pred, y_pred = x_y_data(sample_list_pred)
-    mrr_mean, mrrs = score_per_event(pipe, x_pred, y_pred, _LIST_SIZE)
+    x_pred, y_pred, xy_pred = x_y_data(sample_list_pred)
+    mrr_mean, mrrs = score_per_event(pipe, x_pred, xy_pred)
 
     s_sorted = sorted(s_order)
     indices = [s_order.index(s) for s in s_sorted]
@@ -75,18 +75,17 @@ def analyze_transform(x_train, pipe):
     pipe.named_steps['columntransformer'].transformers_
 
 
-def score_per_event(pipe, x, y, rvli_size):
+def score_per_event(pipe, x, xy):
     prob_arr = pipe.predict_proba(x)
     classes = list(pipe.named_steps['randomforestclassifier'].classes_)
     rel_rv_ind = classes.index(1)
     proba_rel = list(prob_arr[:, rel_rv_ind])
     kst = 0 #iterate start number
     mrrs = []
-    evs = int(len(proba_rel)/rvli_size)
-    for ev in range(evs):
+    for label_i in xy:
+        rvli_size = len(label_i)
         ket = kst + rvli_size
         rv_sort_list = []
-        label_i = y[kst:ket]
         indeces_rv = [i for i, n in enumerate(label_i) if n == 1] #positions where label_i == 1
         rv_probs = proba_rel[kst:ket]
         for ind, prob in enumerate(rv_probs):

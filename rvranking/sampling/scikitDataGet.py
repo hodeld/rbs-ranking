@@ -7,16 +7,16 @@ from rvranking.globalVars import _FAKE_ELWC, _EVENT_FEATURES, _RV_FEATURES
 def get_data():
     sample_list_train, sample_list_test = get_train_test()
 
-    x_train, y_train, f_per_s_train = x_y_data(sample_list_train)
-    x_test, y_test = x_y_data(sample_list_test)
+    x_train, y_train, xy_train = x_y_data(sample_list_train)
+    x_test, y_test, xy_test = x_y_data(sample_list_test)
 
-    return x_train, y_train, x_test, y_test
+    return x_train, y_train, xy_train, x_test, y_test, xy_test
 
 
 def x_y_data(sample_list):
     # x_train, y_train = toTensor(sample_list)
-    x, y = to_data_frame(sample_list)
-    return x, y
+    x, y, x_per_y = to_data_frame(sample_list)
+    return x, y, x_per_y
 
 
 def toTensor(s_list):
@@ -99,17 +99,20 @@ def to_data_frame(s_list):
 
     labels = []
     tot_feat_list = []
+    labels_per_s = []
     for s in s_list:
         rvli = s.rvli
         s_feat_arr = ext_features(s)
-
+        s_labels = []
+        labels_per_s.append(s_labels)
         for rv in rvli:
             rv_feat_arr = ext_features(rv)
             rv_feat_arr.extend(s_feat_arr)
             tot_feat_list.append(rv_feat_arr)
             labels.append(rv.relevance)
+            s_labels.append(rv.relevance)
     feat_matrix = pd.DataFrame(tot_feat_list, columns=all_feat_names, dtype='int')
 
-    return feat_matrix, labels
+    return feat_matrix, labels, labels_per_s
 
 

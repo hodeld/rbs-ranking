@@ -4,7 +4,7 @@ from rvranking.logs import hplogger
 from rvranking.sampling.fakeSampling import iterate_samples
 
 from rvranking.sampling.samplingClasses import SampleList, Sample, RVList, RV
-from rvranking.sampling.setTimeLines import cut_timelines, tline_fn_d
+from rvranking.sampling.setTimeLines import cut_check_timelines, tline_fn_d
 
 # in colab
 import random
@@ -18,7 +18,7 @@ def get_example_features(s, rvli_d, rvlist_all, sample_list,
                       rvli_d]
         tline_fn_d[_SAMPLING](tline_vars)
 
-    cut_timelines(s)
+    cut_check_timelines(s)
     get_pot_rvs(s, rvfirstev_spec)
 
 
@@ -68,6 +68,8 @@ def check_availability(rv, s):
         return False
     else:
         return True
+
+
 
 
 def check_evtype(rv, s, rvfirstev_spec):
@@ -127,7 +129,7 @@ def normalize_features(s):
                 #s.rv_ff = i
             r.id = i
 
-    if 'rv_ff' in _EVENT_FEATURES or 'id' in _RV_FEATURES:  # s.features_attrs
+    if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:  # s.features_attrs
         random.shuffle(s.rvli)
         rvs()
 

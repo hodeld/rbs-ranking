@@ -28,7 +28,8 @@ else:
     INT_N = 'Int64'
     STR_N = 'object'
 
-_TD_PERWK = 2 * 5 # nr or None
+_TD_SEQ_HR = 5
+_TD_PERWK = 2 * _TD_SEQ_HR # nr or None
 
 
 def end_c(val):
@@ -126,10 +127,13 @@ def get_evtypes(file_n='EventType.csv', sep=','):
 
 def get_test_files():
     samples_pred = prep_samples(file_n='samples_test.csv', sep=',')
-    timelines_raw = get_timelines_raw('timelines_test.csv', ',')
+    timelines_raw = get_timelines_raw('timelines_test.csv', ';')
     tlines = prep_timelines(timelines_raw)
     allevs = prep_allevents('allevents_test.csv', ',')
-    return samples_pred, tlines, allevs
+    rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')
+
+    rvs = prep_rv('RVs_test.csv', sep=';')
+    return samples_pred, tlines, allevs, rvs, rvfirstev
 
 
 main_path = base_get_path + '/alopt_files/'
@@ -149,6 +153,7 @@ timelines = prep_timelines(timelines_raw)
  KMAX, RV_TLINE_LEN) = get_time_vars(timelines_raw)
 
 if _TD_PERWK:
+    assert _TD_SEQ_HR * 60 == TD_SEQ
     TD_PERWK = _TD_PERWK
 
 rvfirstev = prep_rv_first_ev(file_n='rvfirstev.csv', sep=',')

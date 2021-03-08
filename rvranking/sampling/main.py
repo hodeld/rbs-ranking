@@ -70,8 +70,6 @@ def check_availability(rv, s):
         return True
 
 
-
-
 def check_evtype(rv, s, rvfirstev_spec):
     try:
         firstev = rvfirstev_spec.loc[rv.id, str(s.evtype)]  # 1, None or date_int

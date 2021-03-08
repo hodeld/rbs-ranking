@@ -8,12 +8,8 @@ from rvranking.logs import hplogger
 
 
 def get_test_samples():
-    samples, timelines, allevents = get_test_files()
+    samples, timelines, allevents, rvs, rvfirstev = get_test_files()
     sample_list_all = [Sample(s) for i, s in samples.iterrows()]
-
-    rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')
-
-    rvs = prep_rv('RVs_test.csv', sep=';')
     rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
 
     train_ratio = 0  # all test

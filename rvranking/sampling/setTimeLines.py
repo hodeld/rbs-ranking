@@ -115,14 +115,17 @@ def get_rv_timelines(timelines_spec, rvlist):
     return rvlist
 
 
-def cut_timelines(s):
+def cut_check_timelines(s):
     ist = s.rangestart
     iet = s.rangeend
+
     for rv in s.rvli:
         try:
             rv.tline = rv.tline.loc[str(ist):str(iet)]
+            assert rv.tline.size == iet - ist + 1
         except (KeyError, ValueError):
             print('event outside timerange: rv, ist, iet', rv.id, ist, iet)
+            s.rvli.remove(rv)
 
 
 def remove_ev_rv(rv, eid, sample_list, allevs_spec):
@@ -138,8 +141,10 @@ def remove_ev_rv(rv, eid, sample_list, allevs_spec):
     if rv is None:
         return False
     try:
+        rv.tline.loc[str(et)]  # to check if end in tline
         rv.tline.loc[str(st):str(et)] = 0  # alternative s.start, s.end
-    except(KeyError, ValueError) as e:
+        assert rv.tline.loc[str(st):str(et)].size == et - st + 1
+    except(KeyError, ValueError, AssertionError) as e:
         print('event created outside timerange: rv.id, start, end', rv.id, st, et)
         return False
     return True

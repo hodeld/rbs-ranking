@@ -31,6 +31,16 @@ def sample_test(cls, s, tlines, allevs):
     print(s.id)
 
 
+def sampling_test(cls, s):
+    print(s.id)
+    for r in s.rvli:
+        r_tline_val = r.tline.loc[str(s.start):str(s.end)].values
+        cls.assertEqual((0 == r_tline_val).all(), True)
+        cls.assertEqual(r_tline_val.size, s.end - s.start + 1)
+        if s.rv_ff == r.id:
+            cls.assertEqual(r.rv_ff, 1)
+
+
 class TestSampling(unittest.TestCase):
 
     def test_samples(self):
@@ -42,7 +52,7 @@ class TestSampling(unittest.TestCase):
             sample_test(self, s, tlines, allevs)
 
     def test_prediction_samples(self):
-        samples_pred, tlines, allevs = get_test_files()
+        samples_pred, tlines, allevs, rvs, rvfirstev = get_test_files()
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         s = sample_list_all[0]
         ist = int(s.start - (TD_PERWK * WEEKS_B))
@@ -52,8 +62,8 @@ class TestSampling(unittest.TestCase):
         for s in sample_list_all:
             sample_test(self, s, tlines, allevs)
 
-    def _sampling(self):
-        sample_list_all = [Sample(s) for i, s in samples.iloc[:5].iterrows()]
+    def test_sampling(self):
+        sample_list_all = [Sample(s) for i, s in samples.iloc[:20].iterrows()]
         rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
         train_ratio = 0.7
 
@@ -64,6 +74,27 @@ class TestSampling(unittest.TestCase):
                                                                 rvfirstev_spec=rvfirstev,
                                                                 allevents_spec=allevents
                                                                 )
+        s_list_tot = sample_list_train + sample_list_test
+        for s in s_list_tot:
+            sampling_test(self, s)
+            self.assertEqual(len(s.rvli), 5)
+
+    def test_predicition_sampling(self):
+        samples_pred, tlines_pred, allevs_pred, rvs_pred, rvfirstev_pred = get_test_files()
+        sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
+        rvlist_all = RVList([RV(r) for i, r in rvs_pred.iterrows()])
+        train_ratio = 0.7
+
+        sample_list_train, sample_list_test = prep_samples_list(sample_list_all,
+                                                                rvlist_all,
+                                                                train_ratio=train_ratio,
+                                                                timelines_spec=tlines_pred,
+                                                                rvfirstev_spec=rvfirstev_pred,
+                                                                allevents_spec=allevs_pred
+                                                                )
+        s_list_tot = sample_list_train + sample_list_test
+        for s in s_list_tot:
+            sampling_test(self, s)
 
     def _test_write_and_input(self):
         # _sampling

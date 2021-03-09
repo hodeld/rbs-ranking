@@ -126,10 +126,10 @@ def get_evtypes(file_n='EventType.csv', sep=','):
 
 
 def get_test_files():
-    samples_pred = prep_samples(file_n='samples_test.csv', sep=',')
+    samples_pred = prep_samples(file_n='samples_test.csv', sep=';')
     timelines_raw = get_timelines_raw('timelines_test.csv', ';')
     tlines = prep_timelines(timelines_raw)
-    allevs = prep_allevents('allevents_test.csv', ',')
+    allevs = prep_allevents('allevents_test.csv', ';')
     rvfirstev = prep_rv_first_ev('rvfirstev_test.csv', sep=';')
 
     rvs = prep_rv('RVs_test.csv', sep=';')

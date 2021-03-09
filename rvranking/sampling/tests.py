@@ -1,14 +1,17 @@
 import random
 import unittest
+import numpy as np
 
 from rvranking.rankingComponents import input_fn
 from rvranking.sampling.elwcWrite import write_elwc
 from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RVList, RV
-from rvranking.globalVars import _TRAIN_DATA_PATH, _RV_FEATURE, _EVENT_FEATURE
+from rvranking.globalVars import _TRAIN_DATA_PATH, _RV_FEATURE, _EVENT_FEATURE, _EVENT_FEATURES, _RV_FEATURES
 from rvranking.dataPrep import samples, timelines, allevents, prep_samples, get_timelines_raw, \
-    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev, get_test_files
+    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev, get_test_files, PPH
 import tensorflow as tf
+
+from rvranking.sampling.scikitDataGet import x_y_data
 
 
 def sample_test(cls, s, tlines, allevs):
@@ -31,14 +34,45 @@ def sample_test(cls, s, tlines, allevs):
     print(s.id)
 
 
-def sampling_test(cls, s):
+def sampling_test(cls, s, allevs_all=None):
     print(s.id)
+    if allevs_all is not None:
+        oneday = PPH * 24
+        range_start = int(s.rangestart - oneday)
+        if range_start < 0:
+            range_start = 0
+        range_end = int(s.rangeend + oneday)
+        if range_end > KMAX:
+            range_end = KMAX
+
+        idx = np.where((allevs_all['Start'] >= range_start) & (allevs_all['End'] <= range_end))
+        evs_range = allevs_all.iloc[idx]
+
     for r in s.rvli:
         r_tline_val = r.tline.loc[str(s.start):str(s.end)].values
         cls.assertEqual((0 == r_tline_val).all(), True)
         cls.assertEqual(r_tline_val.size, s.end - s.start + 1)
-        if s.rv_ff == r.id:
-            cls.assertEqual(r.rv_ff, 1)
+        if allevs_all is not None:
+            index_vals = r.tline.index.values
+            min_t = int(index_vals[0])
+            max_t = int(index_vals[-1])
+            rv_added = s.rv_added
+            allevs = evs_range[evs_range['Rv'] == r.id]
+            allevs = allevs[allevs['Rv added'] >= rv_added]
+            for eid, row in allevs.iterrows():
+                st = row['Start']
+                if st < min_t:
+                    continue
+                et = row['End']
+                if et > max_t:
+                    continue
+
+                r_tline_val = r.tline.loc[str(st):str(et)].values
+                cls.assertEqual((0 == r_tline_val).all(), True)
+                cls.assertEqual(r_tline_val.size, et - st + 1)
+        if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:
+            if s.rv_ff == r.id:
+                cls.assertEqual(r.rv_ff, 1)
 
 
 class TestSampling(unittest.TestCase):
@@ -63,7 +97,8 @@ class TestSampling(unittest.TestCase):
             sample_test(self, s, tlines, allevs)
 
     def test_sampling(self):
-        sample_list_all = [Sample(s) for i, s in samples.iloc[:20].iterrows()]
+        less_samples = samples.sample(n=50) # random rows
+        sample_list_all = [Sample(s) for i, s in less_samples.iterrows()]
         rvlist_all = RVList([RV(r) for i, r in rvs.iterrows()])
         train_ratio = 0.7
 
@@ -75,9 +110,11 @@ class TestSampling(unittest.TestCase):
                                                                 allevents_spec=allevents
                                                                 )
         s_list_tot = sample_list_train + sample_list_test
+        assert len(s_list_tot) > 0
         for s in s_list_tot:
             sampling_test(self, s)
             self.assertEqual(len(s.rvli), 5)
+        x_train, y_train, xy_train = x_y_data(s_list_tot)
 
     def test_prediction_sampling(self):
         samples_pred, tlines_pred, allevs_pred, rvs_pred, rvfirstev_pred = get_test_files()
@@ -94,7 +131,8 @@ class TestSampling(unittest.TestCase):
                                                                 )
         s_list_tot = sample_list_train + sample_list_test
         for s in s_list_tot:
-            sampling_test(self, s)
+            sampling_test(self, s, allevs_pred)
+        x_train, y_train, xy_train = x_y_data(s_list_tot)
 
     def _test_write_and_input(self):
         # _sampling

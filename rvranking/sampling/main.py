@@ -119,13 +119,9 @@ def normalize_features(s):
             r.id += randint
 
     def rvs():
-        for i, r in enumerate(s.rvli, 1):
-            if r.id == s.rv:
-                s.rv = i
+        for r in s.rvli, 1:
             if r.id == s.rv_ff:
                 r.rv_ff = 1
-                #s.rv_ff = i
-            r.id = i
 
     if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:  # s.features_attrs
         random.shuffle(s.rvli)
@@ -175,13 +171,7 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
 
     get_list(sample_list_s)
 
-    if len(sample_list_prep) > 50:
-        hplogger.info('empty rv list: ' + str(k_er))
-        hplogger.info('timerange too short: ' + str(k_tr))
-        hplogger.info('0relevantRV: ' + str(k_rr))
-        hplogger.info('mean_rvs: ' + str(sum(nr_rvs_li) / len(nr_rvs_li)))
-        hplogger.info('rvs_tooshort: ' + str(k_ls))
-        print('rv and sample not same location count', k_loc)
+
 
     print('empty rv list: ' + str(k_er))
     print('timerange too short: ' + str(k_tr))
@@ -206,7 +196,16 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
                     str(len(s_list_test)),
                     ])
     print(msg)
-    hplogger.info(msg)
+
+    if len(sample_list_prep) > 50:
+        hplogger.info('empty rv list: ' + str(k_er))
+        hplogger.info('timerange too short: ' + str(k_tr))
+        hplogger.info('0relevantRV: ' + str(k_rr))
+        hplogger.info('mean_rvs: ' + str(sum(nr_rvs_li) / len(nr_rvs_li)))
+        hplogger.info('rvs_tooshort: ' + str(k_ls))
+        print('rv and sample not same location count', k_loc)
+        hplogger.info(msg)
+
     return s_list_train, s_list_test
 
 

@@ -98,6 +98,7 @@ class RV():
         self.tline_binary = None
         self.prediction = 0
         self.rv_ff = 0  # 0 or 1
+        self.id_norm = 0  # randomized rv id as feature
 
     def features(self):
         f = operator.attrgetter(*_RV_FEATURES)

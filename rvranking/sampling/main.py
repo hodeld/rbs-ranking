@@ -119,7 +119,7 @@ def normalize_features(s):
             r.id += randint
 
     def rvs():
-        for r in s.rvli, 1:
+        for r in s.rvli:
             if r.id == s.rv_ff:
                 r.rv_ff = 1
 

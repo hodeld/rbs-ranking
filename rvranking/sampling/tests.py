@@ -79,7 +79,7 @@ class TestSampling(unittest.TestCase):
             sampling_test(self, s)
             self.assertEqual(len(s.rvli), 5)
 
-    def test_predicition_sampling(self):
+    def test_prediction_sampling(self):
         samples_pred, tlines_pred, allevs_pred, rvs_pred, rvfirstev_pred = get_test_files()
         sample_list_all = [Sample(s) for i, s in samples_pred.iterrows()]
         rvlist_all = RVList([RV(r) for i, r in rvs_pred.iterrows()])

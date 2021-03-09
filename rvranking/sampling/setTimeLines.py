@@ -361,6 +361,7 @@ def according_added_rv(s, sample_list, allevents_spec):
     idx = np.where((allevents_spec['Start'] >= range_start) & (allevents_spec['End'] <= range_end))
     evs_range = allevents_spec.iloc[idx]
 
+    #delete all events added later than the one of event
     all_evs = evs_range[evs_range['Rv added'] >= rv_added]
     ev_ids = all_evs.index.values.tolist()
     assert s.id in ev_ids

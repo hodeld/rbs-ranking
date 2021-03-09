@@ -30,6 +30,7 @@ def get_timerange(s):
         return False
         # ist = 0
     iet = int(s.start + TD_PERWK * weeks_after)
+    iet = int(s.end + TD_PERWK * weeks_after)
     if iet > KMAX:
         # iet = KMAX
         return False
@@ -49,9 +50,10 @@ def same_location(s, rvlist):
 def get_pot_rvs(s, rvfirstev_spec):
     rvlist = s.rvli.copy() # needs to be seperate list with same items to remove items and iterate over!
     for rv in rvlist:
-        if check_availability(rv, s) == False:
-            s.rvli.remove(rv)
-        elif check_evtype(rv, s, rvfirstev_spec) == False:
+        # availability not needed as deleted in cut cut_timelines
+        #if check_availability(rv, s) == False:
+        #   s.rvli.remove(rv)
+        if check_evtype(rv, s, rvfirstev_spec) == False:
             s.rvli.remove(rv)
     check_feat(rv, s)  # probably better leave features
 

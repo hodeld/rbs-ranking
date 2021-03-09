@@ -155,6 +155,7 @@ timelines = prep_timelines(timelines_raw)
 if _TD_PERWK:
     assert _TD_SEQ_HR * 60 == TD_SEQ
     TD_PERWK = _TD_PERWK
+    RV_TLINE_LEN = (WEEKS_B + WEEKS_A) * TD_PERWK
 
 rvfirstev = prep_rv_first_ev(file_n='rvfirstev.csv', sep=',')
 

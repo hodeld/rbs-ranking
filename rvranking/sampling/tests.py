@@ -8,7 +8,7 @@ from rvranking.sampling.main import prep_samples_list
 from rvranking.sampling.samplingClasses import Sample, RVList, RV
 from rvranking.globalVars import _TRAIN_DATA_PATH, _RV_FEATURE, _EVENT_FEATURE, _EVENT_FEATURES, _RV_FEATURES
 from rvranking.dataPrep import samples, timelines, allevents, prep_samples, get_timelines_raw, \
-    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev, get_test_files, PPH
+    prep_timelines, prep_allevents, TD_PERWK, WEEKS_B, WEEKS_A, KMAX, rvs, rvfirstev, get_test_files, PPH, RV_TLINE_LEN
 import tensorflow as tf
 
 from rvranking.sampling.scikitDataGet import x_y_data
@@ -49,9 +49,7 @@ def sampling_test(cls, s, allevs_all=None):
         evs_range = allevs_all.iloc[idx]
 
     for r in s.rvli:
-        r_tline_val = r.tline.loc[str(s.start):str(s.end)].values
-        cls.assertEqual((0 == r_tline_val).all(), True)
-        cls.assertEqual(r_tline_val.size, s.end - s.start + 1)
+        cls.assertEqual(r.tline.size, RV_TLINE_LEN)
         if allevs_all is not None:
             index_vals = r.tline.index.values
             min_t = int(index_vals[0])
@@ -60,16 +58,18 @@ def sampling_test(cls, s, allevs_all=None):
             allevs = evs_range[evs_range['Rv'] == r.id]
             allevs = allevs[allevs['Rv added'] >= rv_added]
             for eid, row in allevs.iterrows():
+                if eid == s.id:
+                    continue
                 st = row['Start']
-                if st < min_t:
-                    continue
                 et = row['End']
-                if et > max_t:
+                if st < min_t or et > max_t:
                     continue
-
-                r_tline_val = r.tline.loc[str(st):str(et)].values
-                cls.assertEqual((0 == r_tline_val).all(), True)
-                cls.assertEqual(r_tline_val.size, et - st + 1)
+                try:
+                    r_tline_ev = r.tline.loc[str(st):str(et)].values
+                    cls.assertEqual((0 == r_tline_ev).all(), True)
+                    #cls.assertEqual(r_tline_ev.size, et - st + 1)
+                except KeyError:  # if ev range in sample range
+                    continue
         if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:
             if s.rv_ff == r.id:
                 cls.assertEqual(r.rv_ff, 1)
@@ -113,7 +113,7 @@ class TestSampling(unittest.TestCase):
         assert len(s_list_tot) > 0
         for s in s_list_tot:
             sampling_test(self, s)
-            self.assertEqual(len(s.rvli), 5)
+
         x_train, y_train, xy_train = x_y_data(s_list_tot)
 
     def test_prediction_sampling(self):
@@ -132,6 +132,7 @@ class TestSampling(unittest.TestCase):
         s_list_tot = sample_list_train + sample_list_test
         for s in s_list_tot:
             sampling_test(self, s, allevs_pred)
+            self.assertEqual(len(s.rvli), 5)
         x_train, y_train, xy_train = x_y_data(s_list_tot)
 
     def _test_write_and_input(self):

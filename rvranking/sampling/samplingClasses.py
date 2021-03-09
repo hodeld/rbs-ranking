@@ -37,6 +37,7 @@ class Sample():
         self.locday = locday
         self.start = start
         self.end = end
+        self.tdelta = end-start
         self.rangestart = 0
         self.rangeend = 0
         self.rv = rv

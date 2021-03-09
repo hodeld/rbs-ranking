@@ -3,7 +3,7 @@ import copy
 import pandas as pd
 import numpy as np
 
-from rvranking.dataPrep import PPH, KMAX
+from rvranking.dataPrep import PPH, KMAX, TD_PERWK, WEEKS_A, WEEKS_B, RV_TLINE_LEN
 
 
 def filling_up(tline_vars):
@@ -118,11 +118,16 @@ def get_rv_timelines(timelines_spec, rvlist):
 def cut_check_timelines(s):
     ist = s.rangestart
     iet = s.rangeend
+    st = s.start
+    et = s.end
 
     for rv in s.rvli:
         try:
-            rv.tline = rv.tline.loc[str(ist):str(iet)]
-            assert rv.tline.size == iet - ist + 1
+            ctline = rv.tline.loc[str(ist):str(iet)]
+            idx = ctline.loc[str(st):str(et)].index
+            ctline = ctline.drop(idx)
+            rv.tline = ctline
+            assert rv.tline.size == RV_TLINE_LEN
         except (KeyError, ValueError):
             print('event outside timerange: rv, ist, iet', rv.id, ist, iet)
             s.rvli.remove(rv)
@@ -351,10 +356,10 @@ def according_added_rv(s, sample_list, allevents_spec):
     rv_added = s.rv_added
     #get Ids of events
     oneday = PPH * 24
-    range_start = int(s.rangestart - oneday)
+    range_start = int(s.rangestart - oneday) - s.tdelta
     if range_start < 0:
         range_start = 0
-    range_end = int(s.rangeend + oneday)
+    range_end = int(s.rangeend + oneday) + s.tdelta
     if range_end > KMAX:
         range_end = KMAX
 

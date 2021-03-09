@@ -78,5 +78,5 @@ _SAVE_CHECKPOINT_STEPS = 1000
 
 _RANK_TOP_NRS = [1, 2, 5]
 
-_EVENT_FEATURES = ['evtype', 'gespever', 'hwx', 'uma']  # 'evtype', 'gespever', 'hwx', 'uma'
-_RV_FEATURES = ['rv_ff', 'sex', 'tline', 'tline_binary']  # 'rv_ff',  'sex', 'tline', 'tline_binary'
+_EVENT_FEATURES = ['gespever'] # ['evtype', 'gespever', 'hwx', 'uma', 'tdelta']  # 'evtype', 'gespever', 'hwx', 'uma'
+_RV_FEATURES = ['tline_binary']  # 'tline', 'rv_ff', 'sex',  'sex', 'tline', 'tline_binary', (id_norm)

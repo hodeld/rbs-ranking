@@ -5,14 +5,34 @@ LOG_KEYS = [
     'comment',
     'comment_predict',
 
-    #global vars
+    # scikit results
+    'acc_sc',
+    'mrr_predictions_av',
+
+    # global vars
     'fake',
     'baseline',
     'sampling method',
+    'event_tokens',
+    'rv_tokens',
+    'relevance',
+
+    # sampling
+    'mean_rvs',
+    'rvs_tooshort',
+
+
+    # data size results
+    'length orig, prep, train, test',
+
+]
+
+
+tensorflow_k = [
+    # tensorflow
+    'list_size',
     'embedding_dimension',
     'loss_function',
-    'relevance',
-    'list_size',
     'batch_size',
     'learning_rate',
     'dropout_rate',
@@ -28,21 +48,14 @@ LOG_KEYS = [
     'loss',
     'labels_mean',
     'logits_mean',
-    'mean_rvs',
-    'rvs_tooshort',
 
+# predictions
+    'predictions',
+
+]
+
+baseline_k = [
     # baseline
     'mrr_mean',
     'ndcg1_mean',
-
-    # predictions
-    'predictions',
-
-    # results
-    'length orig, prep, train, test',
-
-    # scikit
-    'acc_sc', 'mrr_predictions_av'
-
-
 ]

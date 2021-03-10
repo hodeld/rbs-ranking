@@ -41,5 +41,8 @@ LOG_KEYS = [
     # results
     'length orig, prep, train, test',
 
+    # scikit
+    'acc_sc', 'mrr_predictions_av'
+
 
 ]

@@ -94,6 +94,7 @@ class RV():
         self.id = rvid
         self.location = location
         self.sex = sex
+        self.gespever = 0
         self.relevance = 0
         self.tline = None
         self.tline_binary = None

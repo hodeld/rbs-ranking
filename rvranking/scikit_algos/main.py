@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.compose import make_column_transformer, make_column_selector
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler, FunctionTransformer, StandardScaler
@@ -47,11 +49,12 @@ def fit_predict():
     pipe.fit(x_train, y_train)
     acc_sc = accuracy_score(y_test, pipe.predict(x_test))
     print('acc_sc', acc_sc)
-    print('classes', pipe.named_steps['randomforestclassifier'].classes_)
+    print('classes', pipe.named_steps['randomforestclassifier'].classes_)  # todo better: regression?!
     hplogger.info('named_steps: ' + str(list(pipe.named_steps.keys())))
     hplogger.info('acc_sc: ' + str(acc_sc))
 
     features_importance(pipe, x_train)
+    features_plot(x_train, ['tline0', 'tline7'])
 
     mrr_mean, mrrs, li_probs = score_per_event(pipe, x_test, xy_test)
     hplogger.info('mrr_mean: ' + str(mrr_mean))
@@ -74,7 +77,7 @@ def fit_predict():
 
 
 def analyze_transform(x_train, pipe):
-    import pandas as pd
+
     s1 = pd.DataFrame([x_train.loc[0]])
     pipe.named_steps['columntransformer'].transform(s1)
     pipe.named_steps['columntransformer'].transformers_
@@ -120,13 +123,22 @@ def get_rv_data(sample_li):
     return rv_data
 
 
-def features_importance(pipe, x_train):
+def features_importance(pipe, x):
     forest = pipe.named_steps['randomforestclassifier']
     importances = forest.feature_importances_
     std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis = 0)
     indices = np.argsort(importances)[::-1]
-    for f in range(x_train.shape[1]):
-        print("%d. f %s (%f)" % (f + 1, x_train.columns[indices[f]], importances[indices[f]]))
+    for f in range(x.shape[1]):
+        print("%d. f %s (%f)" % (f + 1, x.columns[indices[f]], importances[indices[f]]))
+
+
+def features_plot(feat_matrix, feat_ns):
+    for n in feat_ns:
+        feat_matrix[n].value_counts().plot.bar()
+    plt.show()
+
+
+# to plot features:
 
 
 if __name__ == '__main__':

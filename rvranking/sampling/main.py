@@ -51,11 +51,9 @@ def get_pot_rvs(s, rvfirstev_spec):
     rvlist = s.rvli.copy() # needs to be seperate list with same items to remove items and iterate over!
     for rv in rvlist:
         # availability not needed as deleted in cut cut_timelines
-        #if check_availability(rv, s) == False:
-        #   s.rvli.remove(rv)
-        if check_evtype(rv, s, rvfirstev_spec) == False:
+        if not check_evtype(rv, s, rvfirstev_spec):
             s.rvli.remove(rv)
-    check_feat(rv, s)  # probably better leave features
+    check_gespever(s)
 
 
 def check_availability(rv, s):
@@ -85,12 +83,26 @@ def check_evtype(rv, s, rvfirstev_spec):
         return False
 
 
-def check_feat(rv, s):
-    if s.gespever > 0:
-        rvlist = s.rvli
-        rvlist = rvlist.filter(s.gespever, 'sex')
-        s.rvli = rvlist
-        # UMA and HWX just left with features
+def check_gespever(s):
+    def gespver_f():
+        if s.gespever > 0:
+            if s.gespever == r.sex:
+                r.gespever = 1
+            else:
+                r.gespever = -1
+        else:
+            r.gespever = 0
+
+    if 'gespever' in _RV_FEATURES:  # filter out sex is better than add as feature
+        for r in s.rvli:
+            # only in combination of sex of rv
+            gespver_f()
+    else:
+        if s.gespever > 0:
+            rvlist = s.rvli
+            rvlist = rvlist.filter(s.gespever, 'sex')
+            s.rvli = rvlist
+            # UMA and HWX just left with features
 
 
 def assign_relevance(s):
@@ -120,14 +132,18 @@ def normalize_features(s):
         for r in s.rvli:
             r.id += randint
 
-    def rvs():
-        for r in s.rvli:
-            if r.id == s.rv_ff:
-                r.rv_ff = 1
+    def rvff():
+        if r.id == s.rv_ff:
+            r.rv_ff = rv_ff_val
 
-    if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:  # s.features_attrs
-        random.shuffle(s.rvli)
-        rvs()
+    if s.hwx == 1 or s.uma == 1:
+        rv_ff_val = 2
+    else:
+        rv_ff_val = 1
+
+    for r in s.rvli:
+        if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:  # s.features_attrs
+            rvff()
 
 
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
@@ -172,8 +188,6 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     k_er, k_tr, k_rr, k_ls, k_loc = 0, 0, 0, 0, 0
 
     get_list(sample_list_s)
-
-
 
     print('empty rv list: ' + str(k_er))
     print('timerange too short: ' + str(k_tr))

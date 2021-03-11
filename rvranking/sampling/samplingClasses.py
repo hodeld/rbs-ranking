@@ -5,7 +5,7 @@ import numpy as np
 
 from rvranking.logs import hplogger
 from rvranking.globalVars import RELEVANCE, _EVENT_FEATURES, _RV_FEATURES
-from rvranking.dataPrep import PPH
+from rvranking.dataPrep import PPH, WEEKS_B, TD_PERWK, WEEKS_A
 
 
 class Sample():
@@ -98,23 +98,29 @@ class RV():
         self.relevance = 0
         self.tline = None
         self.tline_binary = None
+        self.time_before = 0
+        self.time_after = 0
         self.prediction = 0
         self.rv_ff = 0  # 0 or 1
         self.id_norm = 0  # randomized rv id as feature
+        self.hwx = 0  # 0 or 1, 1 if s.hwx and rv = rv_ff
+        self.uma = 0  # 0 or 1
 
     def features(self):
+        if 'tline_binary' in _RV_FEATURES:
+            self._make_tlinebinary()
+        if 'time_before' in _RV_FEATURES or 'time_after' in _RV_FEATURES:
+            self._make_tlinebinary()
+            range_b = WEEKS_B * TD_PERWK
+            self.time_before = sum(self.tline_binary.iloc[:range_b])
+            self.time_after = sum(self.tline_binary.iloc[range_b:])
+
         f = operator.attrgetter(*_RV_FEATURES)
         res = f(self)
         if type(res) == tuple:
             li = list(res)
         else:
             li = [res]
-        if 'tline_binary' in _RV_FEATURES:
-            k = _RV_FEATURES.index('tline_binary')
-            bin_tline = self.tline.copy()
-            bin_tline[:] = np.where(self.tline < 1, 0, 1)
-            #newtline = pd.concat([self.tline, bin_tline])
-            li[k] = bin_tline
         return li
 
     def features_fake(self):
@@ -130,6 +136,12 @@ class RV():
             random.randint(1, 30),
         ]
         return flist
+
+    def _make_tlinebinary(self):
+        if self.tline_binary is None:
+            bin_tline = self.tline.copy()
+            bin_tline[:] = np.where(self.tline < 1, 0, 1)
+            self.tline_binary = bin_tline
 
 
 class RVList(list):

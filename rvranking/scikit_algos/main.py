@@ -3,9 +3,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.compose import make_column_transformer, make_column_selector
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import MinMaxScaler, FunctionTransformer, StandardScaler
+from sklearn.preprocessing import MinMaxScaler, FunctionTransformer, StandardScaler, OneHotEncoder
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import accuracy_score
+from sklearn.inspection import permutation_importance
 
 from rvranking.prediction.sampling import get_test_samples
 from rvranking.sampling.scikitDataGet import get_data, x_y_data
@@ -19,8 +20,10 @@ def scale_evtypes(x):
     return z
 
 
-evtype_scaler = FunctionTransformer(func=scale_evtypes)
+fct_transformer = FunctionTransformer(func=scale_evtypes)
 std_scaler = StandardScaler()
+cat_encoder = OneHotEncoder(handle_unknown='ignore')  # ignore unknown categories in test (if not seen in train)
+evtype_scaler = fct_transformer  # fct_transformer or  (cat_encoder) -> not working yet
 
 transf_dict = {
 # columns with this regex pattern get transformered,
@@ -128,14 +131,27 @@ def features_importance(pipe, x):
     importances = forest.feature_importances_
     std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis = 0)
     indices = np.argsort(importances)[::-1]
-    for f in range(x.shape[1]):
+    max_range = x.shape[1]
+    range_nr = min(max_range, 10)
+    for f in range(range_nr):
         print("%d. f %s (%f)" % (f + 1, x.columns[indices[f]], importances[indices[f]]))
+
+
+def features_importance_perm(pipe, x, y):
+    rf = pipe.named_steps['randomforestclassifier']
+    result = permutation_importance(rf, x, y, n_repeats=10, random_state=42, n_jobs=2)
+    importances = result.importances_mean
+    sorted_idx = importances.argsort()[::-1]
+    max_range = x.shape[1]
+    range_nr = min(max_range, 10)
+    for f in range(range_nr):
+        print("%d. f %s (%f)" % (f + 1, x.columns[sorted_idx[f]], importances[sorted_idx[f]]))
 
 
 def features_plot(feat_matrix, feat_ns):
     for n in feat_ns:
-        feat_matrix[n].value_counts().plot.bar()
-    plt.show()
+        feat_matrix[n].value_counts().plot.bar(title=n)
+        plt.show()
 
 
 # to plot features:

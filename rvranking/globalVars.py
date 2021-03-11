@@ -78,8 +78,14 @@ _SAVE_CHECKPOINT_STEPS = 1000
 
 _RANK_TOP_NRS = [1, 2, 5]
 
-# 'hwx', 'uma' now considered in rv_ff
+# 'hwx', 'uma' now considered in on rv
 # sex considered in gespever.
 # gespever better as filter than as feature
 _EVENT_FEATURES = ['evtype', 'tdelta']  #  'evtype', 'tdelta'
-_RV_FEATURES = ['rv_ff', 'tline_binary', 'tline']   # 'tline_binary', 'tline', 'rv_ff', (id_norm, 'gespever')
+
+# 'tline_binary', 'tline',
+# 'rv_ff', 'hwx', 'uma'
+# 'time_before', 'time_after'
+# (id_norm, 'gespever')
+_RV_FEATURES = ['tline', ]
+

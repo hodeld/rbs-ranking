@@ -134,16 +134,14 @@ def normalize_features(s):
 
     def rvff():
         if r.id == s.rv_ff:
-            r.rv_ff = rv_ff_val
-
-    if s.hwx == 1 or s.uma == 1:
-        rv_ff_val = 2
-    else:
-        rv_ff_val = 1
+            r.rv_ff = 1
+            if s.hwx == 1:
+                r.hwx = 1
+            elif s.uma == 1:
+                r.uma = 1
 
     for r in s.rvli:
-        if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:  # s.features_attrs
-            rvff()
+        rvff()
 
 
 def prep_samples_list(sample_list_all, rvlist_all, train_ratio,

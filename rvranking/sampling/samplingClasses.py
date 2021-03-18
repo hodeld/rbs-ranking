@@ -98,6 +98,8 @@ class RV():
         self.relevance = 0
         self.tline = None
         self.tline_binary = None
+        self.cut_tline = None
+        self.cut_tline_binary = None
         self.time_before = 0
         self.time_after = 0
         self.prediction = 0
@@ -108,12 +110,14 @@ class RV():
 
     def features(self):
         if 'tline_binary' in _RV_FEATURES:
-            self._make_tlinebinary()
+            self._make_tlinebinary('tline_binary')
+        if 'cut_tline_binary' in _RV_FEATURES:
+            self._make_tlinebinary('cut_tline_binary')
         if 'time_before' in _RV_FEATURES or 'time_after' in _RV_FEATURES:
-            self._make_tlinebinary()
+            self._make_tlinebinary('cut_tline_binary')
             range_b = WEEKS_B * TD_PERWK
-            self.time_before = sum(self.tline_binary.iloc[:range_b])
-            self.time_after = sum(self.tline_binary.iloc[range_b:])
+            self.time_before = sum(self.cut_tline_binary.iloc[:range_b])
+            self.time_after = sum(self.cut_tline_binary.iloc[range_b:])
 
         f = operator.attrgetter(*_RV_FEATURES)
         res = f(self)
@@ -143,9 +147,9 @@ class RV():
                 tline_name = 'tline'
             else:
                 tline_name = 'cut_tline'
-            bin_tline = self.tline.copy()
+            bin_tline = getattr(self, tline_name).copy()
             bin_tline[:] = np.where(self.tline < 1, 0, 1)
-            self.tline_binary = bin_tline
+            setattr(self, fname, bin_tline)
 
 
 class RVList(list):

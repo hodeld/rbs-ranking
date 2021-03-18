@@ -157,6 +157,7 @@ def remove_ev_rv(rv, eid, sample_list, allevs_spec):
     except(KeyError, ValueError, AssertionError) as e:
         print('event created outside timerange: rv.id, start, end', rv.id, st, et)
         return False
+    assert rv.tline.loc[str(st):str(et)].any() == False  # need to be ==
     return True
 
 
@@ -377,8 +378,7 @@ def according_added_rv(s, sample_list, allevents_spec):
 
     #delete all events added later than the one of event
     all_evs = all_evs[all_evs['Rv added'] >= rv_added]
-    ev_ids = all_evs.index.values.tolist()
-    assert s.id in ev_ids
+
     sample_li = []
     evs = []
     for eid, row in all_evs.iterrows():  #index and row
@@ -389,8 +389,10 @@ def according_added_rv(s, sample_list, allevents_spec):
                 continue
             sample_li.append(ev)
             evs += ev.sevs
-
-    remove_evs(evs, rvli, sample_list, allevents_spec)
+    assert s.id in evs
+    # zeroes out for each event for corr. rv
+    # rvs still can have event during sample! -> check_availability
+    remove_evs(evs, rvli, sample_list, allevents_spec)  # zeroes out for each event for corr. rv
 
 
 def get_sample(sample_list, eid):

@@ -56,8 +56,8 @@ def fit_predict():
     hplogger.info('named_steps: ' + str(list(pipe.named_steps.keys())))
     hplogger.info('acc_sc: ' + str(acc_sc))
 
-    features_importance(pipe, x_train)
-    features_plot(x_train, ['tline0', 'tline7'])
+    imp_features = features_importance(pipe, x_train)
+    features_plot(x_train, imp_features)
 
     mrr_mean, mrrs, li_probs = score_per_event(pipe, x_test, xy_test)
     hplogger.info('mrr_mean: ' + str(mrr_mean))
@@ -126,24 +126,28 @@ def get_rv_data(sample_li):
     return rv_data
 
 
-def features_importance(pipe, x):
+def features_importance(pipe, x, max_nr=10, nr_return=4):
     forest = pipe.named_steps['randomforestclassifier']
     importances = forest.feature_importances_
     std = np.std([tree.feature_importances_ for tree in forest.estimators_], axis = 0)
     indices = np.argsort(importances)[::-1]
     max_range = x.shape[1]
-    range_nr = min(max_range, 10)
+    range_nr = min(max_range, max_nr)
+    imp_features = []
     for f in range(range_nr):
         print("%d. f %s (%f)" % (f + 1, x.columns[indices[f]], importances[indices[f]]))
+        if f < nr_return:
+            imp_features.append(x.columns[indices[f]])
+    return imp_features
 
 
-def features_importance_perm(pipe, x, y):
+def features_importance_perm(pipe, x, y, max_nr=10):
     rf = pipe.named_steps['randomforestclassifier']
     result = permutation_importance(rf, x, y, n_repeats=10, random_state=42, n_jobs=2)
     importances = result.importances_mean
     sorted_idx = importances.argsort()[::-1]
     max_range = x.shape[1]
-    range_nr = min(max_range, 10)
+    range_nr = min(max_range, max_nr)
     for f in range(range_nr):
         print("%d. f %s (%f)" % (f + 1, x.columns[sorted_idx[f]], importances[sorted_idx[f]]))
 

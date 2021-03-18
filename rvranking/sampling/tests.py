@@ -19,7 +19,6 @@ def sample_test(cls, s, tlines, allevs):
     tline = tlines.loc[str(rv)]
     ev_tline_val = tline.loc[str(s.start):str(s.end)].values
     ev = allevs.loc[s.id]
-    print('id', s.id)
     if s.teams:
         pass
     else:
@@ -29,13 +28,10 @@ def sample_test(cls, s, tlines, allevs):
     cls.assertEqual(ev['Type'], s.evtype)
     cls.assertEqual(ev['Rv added'], s.rv_added)
     evtype = s.evtype
-    print('id', 'evtype', 'tline', s.id, evtype, ev_tline_val)
     cls.assertEqual((evtype == ev_tline_val).all(), True)
-    print(s.id)
 
 
 def sampling_test(cls, s, allevs_all=None):
-    print(s.id)
     if allevs_all is not None:
         oneday = PPH * 24
         range_start = int(s.rangestart - oneday)
@@ -50,6 +46,8 @@ def sampling_test(cls, s, allevs_all=None):
 
     for r in s.rvli:
         cls.assertEqual(r.tline.size, RV_TLINE_LEN)
+        cls.assertEqual(r.tline.iloc[WEEKS_B * TD_PERWK], 0)  # WEEKS_B  * TD_PERWK
+        cls.assertEqual(r.tline.loc[str(s.start):str(s.end)].any(), False)  # all zero
         if allevs_all is not None:
             index_vals = r.tline.index.values
             min_t = int(index_vals[0])
@@ -64,12 +62,9 @@ def sampling_test(cls, s, allevs_all=None):
                 et = row['End']
                 if st < min_t or et > max_t:
                     continue
-                try:
-                    r_tline_ev = r.tline.loc[str(st):str(et)].values
-                    cls.assertEqual((0 == r_tline_ev).all(), True)
-                    #cls.assertEqual(r_tline_ev.size, et - st + 1)
-                except KeyError:  # if ev range in sample range
-                    continue
+                cls.assertEqual(st, s.start)
+                r_tline_ev = r.tline.loc[str(st):str(et)].values
+                cls.assertEqual((0 == r_tline_ev).all(), True)
         if 'rv_ff' in _EVENT_FEATURES or 'rv_ff' in _RV_FEATURES:
             if s.rv_ff == r.id:
                 cls.assertEqual(r.rv_ff, 1)

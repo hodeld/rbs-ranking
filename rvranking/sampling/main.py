@@ -51,8 +51,10 @@ def same_location(s, rvlist):
 def get_pot_rvs(s, rvfirstev_spec):
     rvlist = s.rvli.copy() # needs to be seperate list with same items to remove items and iterate over!
     for rv in rvlist:
-        # availability not needed as deleted in cut cut_timelines
-        if not check_evtype(rv, s, rvfirstev_spec):
+        # availability needed with rv_added -> rv can have event during sample event
+        if not check_availability(rv, s):
+            s.rvli.remove(rv)
+        elif not check_evtype(rv, s, rvfirstev_spec):
             s.rvli.remove(rv)
     check_gespever(s)
 
@@ -65,7 +67,7 @@ def check_availability(rv, s):
         return False
     if rv.tline.loc[str(s.start):str(s.end)].any():  # if not all are 0
         if rv.id == s.rv:  # that should not be the case:
-            print('sample where rv is not available', s.id, s.rv)
+            print('sample where corresponding rv is not available', s.id, s.rv)
         return False
     else:
         return True

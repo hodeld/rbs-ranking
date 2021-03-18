@@ -84,8 +84,10 @@ _RANK_TOP_NRS = [1, 2, 5]
 _EVENT_FEATURES = ['evtype', 'tdelta']  #  'evtype', 'tdelta'
 
 # 'tline_binary', 'tline',
+# cut out event 'cut_tline_binary', 'cut_tline',
 # 'rv_ff', 'hwx', 'uma'
 # 'time_before', 'time_after'
 # (id_norm, 'gespever')
-_RV_FEATURES = ['tline', ]
+_RV_FEATURES = ['tline', 'rv_ff',
+                'hwx', 'uma', 'time_before', 'time_after']
 

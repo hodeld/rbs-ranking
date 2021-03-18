@@ -117,19 +117,24 @@ def get_rv_timelines(timelines_spec, rvlist):
 
 def cut_check_timelines(s):
     ist = s.rangestart
-    iet = s.rangeend
+    iet_long = s.rangeend
+    iet_short = s.rangeend_short
     st = s.start
     et = s.end
 
     for rv in s.rvli:
         try:
-            ctline = rv.tline.loc[str(ist):str(iet)]
-            idx = ctline.loc[str(st):str(et)].index
-            ctline = ctline.drop(idx)
-            rv.tline = ctline
-            assert rv.tline.size == RV_TLINE_LEN
+            tline_long = rv.tline.loc[str(ist):str(iet_long)]
+            tline = tline_long.loc[str(ist):str(iet_short)]
+
+            idx = tline_long.loc[str(st):str(et)].index
+            cuttline = tline_long.drop(idx)
+
+            rv.cut_tline = cuttline
+            rv.tline = tline
+            assert rv.tline.size == rv.cut_tline.size == RV_TLINE_LEN
         except (KeyError, ValueError):
-            print('event outside timerange: rv, ist, iet', rv.id, ist, iet)
+            print('event outside timerange: rv, ist, iet', rv.id, ist, iet_long)
             s.rvli.remove(rv)
 
 
@@ -363,11 +368,15 @@ def according_added_rv(s, sample_list, allevents_spec):
     if range_end > KMAX:
         range_end = KMAX
 
-    idx = np.where((allevents_spec['Start'] >= range_start) & (allevents_spec['End'] <= range_end))
-    evs_range = allevents_spec.iloc[idx]
+    # filter according rvs in same location
+    rv_ids = [r.id for r in rvli]
+    all_evs = allevents_spec[allevents_spec['Rv'].isin(rv_ids)]
+
+    idx = np.where((all_evs['Start'] >= range_start) & (all_evs['End'] <= range_end))
+    all_evs = all_evs.iloc[idx]
 
     #delete all events added later than the one of event
-    all_evs = evs_range[evs_range['Rv added'] >= rv_added]
+    all_evs = all_evs[all_evs['Rv added'] >= rv_added]
     ev_ids = all_evs.index.values.tolist()
     assert s.id in ev_ids
     sample_li = []

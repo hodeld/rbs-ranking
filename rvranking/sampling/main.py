@@ -29,13 +29,14 @@ def get_timerange(s):
     if ist < 0:
         return False
         # ist = 0
-    iet = int(s.start + TD_PERWK * weeks_after)
-    iet = int(s.end + TD_PERWK * weeks_after)
-    if iet > KMAX:
+    iet_short = int(s.start + TD_PERWK * weeks_after) - 1
+    iet_long = int(s.end + TD_PERWK * weeks_after)
+    if iet_long > KMAX:
         # iet = KMAX
         return False
     s.rangestart = ist
-    s.rangeend = iet
+    s.rangeend = iet_long
+    s.rangeend_short = iet_short
     return True
 
 
@@ -184,6 +185,8 @@ def prep_samples_list(sample_list_all, rvlist_all, train_ratio,
     rvli_d = {}
     sample_list_prep = []
     k_er, k_tr, k_rr, k_ls, k_loc = 0, 0, 0, 0, 0
+
+    # todo filter allevents according location as soon it is in allevent
 
     get_list(sample_list_s)
 

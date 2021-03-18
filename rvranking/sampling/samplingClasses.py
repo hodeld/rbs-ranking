@@ -137,8 +137,12 @@ class RV():
         ]
         return flist
 
-    def _make_tlinebinary(self):
-        if self.tline_binary is None:
+    def _make_tlinebinary(self, fname):
+        if getattr(self, fname) is None:
+            if fname == 'tline_binary':
+                tline_name = 'tline'
+            else:
+                tline_name = 'cut_tline'
             bin_tline = self.tline.copy()
             bin_tline[:] = np.where(self.tline < 1, 0, 1)
             self.tline_binary = bin_tline

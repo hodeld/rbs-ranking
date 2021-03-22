@@ -12,6 +12,13 @@ change_var = {'any_variable': 0}
 # all_zero and zero_corresponding: all samples: len(rvs) < 10
 _SAMPLING = 'acc_added_rv'   # 'acc_added_rv' OR 'all_zero' OR 'filling_up' OR filling_opposite OR
                                                 # 'zero_corresponding OR  zero_relevant_rv
+
+#  scikit model
+_SAVE_MODEL = True
+_RESTORE = False
+
+_RV_EQ = True  # True or False: if rv_eq should have relevance of 1
+
 #RV specific variables
 _RV_FEATURE = 'rv_tokens'
 _EVENT_FEATURE = 'event_tokens'
@@ -22,9 +29,6 @@ RELEVANCE = 1
 
 # The document relevance label.
 _LABEL_FEATURE = "relevance"
-
-_PADDING_LABEL = -1
-#_BATCH_SIZE = 10
 
 # The maximum number of rv's per event in the dataset.
 # Document lists are padded or truncated to this size.
@@ -88,6 +92,6 @@ _EVENT_FEATURES = ['evtype', 'tdelta']  #  'evtype', 'tdelta'
 # 'rv_ff', 'hwx', 'uma'
 # 'time_before', 'time_after'
 # (id_norm, 'gespever')
-_RV_FEATURES = ['tline', 'rv_ff',
+_RV_FEATURES = ['rv_ff',
                 'hwx', 'uma', 'time_before', 'time_after']
 

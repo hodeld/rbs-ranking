@@ -7,12 +7,14 @@ from sklearn.preprocessing import MinMaxScaler, FunctionTransformer, StandardSca
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import accuracy_score
 from sklearn.inspection import permutation_importance
+import joblib
+import pathlib
 
 from rvranking.prediction.sampling import get_test_samples
 from rvranking.sampling.scikitDataGet import get_data, x_y_data
 from rvranking.dataPrep import MIN_ID, MAX_ID
 from rvranking.logs import hplogger
-from rvranking.globalVars import _LIST_SIZE, _LIST_SIZE_PREDICT
+from rvranking.globalVars import _LIST_SIZE, _LIST_SIZE_PREDICT, _RESTORE, _SAVE_MODEL
 
 
 def scale_evtypes(x):
@@ -48,8 +50,17 @@ def fit_predict():
 
     hplogger.info('transformer: ' + tfr_name)
 
-    pipe = make_pipeline(tfr, clf)  # memory='scikitmodel' cache works only once program is running or prob can be pickle.load(x)
-    pipe.fit(x_train, y_train)
+    parent = pathlib.Path(__file__).resolve().parents[2]
+    fpath = pathlib.Path(parent, 'output', 'saved_models', 'scikit_mod', 'pipe.pkl')
+    if not _RESTORE:
+        pipe = make_pipeline(tfr, clf)
+        pipe.fit(x_train, y_train)
+        if _SAVE_MODEL:
+            joblib.dump(pipe, fpath)
+
+    else:
+        pipe = joblib.load(fpath)
+
     acc_sc = accuracy_score(y_test, pipe.predict(x_test))
     print('acc_sc', acc_sc)
     print('classes', pipe.named_steps['randomforestclassifier'].classes_)  # todo better: regression?!
@@ -61,6 +72,7 @@ def fit_predict():
 
     mrr_mean, mrrs, li_probs = score_per_event(pipe, x_test, xy_test)
     hplogger.info('mrr_mean: ' + str(mrr_mean))
+    print('mrr_mean', acc_sc)
 
     sample_list_pred, s_order = get_test_samples()
     x_pred, y_pred, xy_pred = x_y_data(sample_list_pred)
@@ -80,7 +92,6 @@ def fit_predict():
 
 
 def analyze_transform(x_train, pipe):
-
     s1 = pd.DataFrame([x_train.loc[0]])
     pipe.named_steps['columntransformer'].transform(s1)
     pipe.named_steps['columntransformer'].transformers_

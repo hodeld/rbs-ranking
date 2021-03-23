@@ -29,7 +29,9 @@ else:
     STR_N = 'object'
 
 _TD_SEQ_HR = 5
-_TD_PERWK = 2 * _TD_SEQ_HR # nr or None
+_DAY_HR = 10
+_TD_PER_DAY = _DAY_HR / _TD_SEQ_HR
+_TD_PERWK = 5 * _TD_PER_DAY  # nr or None
 
 
 def end_c(val):
@@ -122,7 +124,7 @@ def get_evtypes(file_n='EventType.csv', sep=','):
     evtypes = evtypes_raw.iloc[:, 0:1]  # additional columns
     ev_min = evtypes.min()[0]
     ev_max = evtypes.max()[0]
-    return ev_min, ev_max
+    return ev_min, ev_max, evtypes_raw
 
 
 def get_test_files():
@@ -144,7 +146,7 @@ rvs = prep_rv()
 
 allevents = prep_allevents()
 # TIMELINES
-MIN_ID, MAX_ID = get_evtypes()
+MIN_ID, MAX_ID, ev_types = get_evtypes()
 timelines_raw = get_timelines_raw()
 timelines = prep_timelines(timelines_raw)
 
@@ -156,6 +158,11 @@ if _TD_PERWK:
     assert _TD_SEQ_HR * 60 == TD_SEQ
     TD_PERWK = _TD_PERWK
     RV_TLINE_LEN = (WEEKS_B + WEEKS_A) * TD_PERWK
+    TD_PER_DAY = _TD_PER_DAY
+else:
+    _TD_PER_DAY = 24*60/TD_SEQ
+
+MO_START = - _TD_PER_DAY * tstart.weekday()
 
 rvfirstev = prep_rv_first_ev(file_n='rvfirstev.csv', sep=',')
 

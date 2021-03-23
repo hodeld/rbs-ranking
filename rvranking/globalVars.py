@@ -92,6 +92,6 @@ _EVENT_FEATURES = ['evtype', 'tdelta']  #  'evtype', 'tdelta'
 # 'rv_ff', 'hwx', 'uma'
 # 'time_before', 'time_after'
 # (id_norm, 'gespever')
-_RV_FEATURES = ['rv_ff',
+_RV_FEATURES = ['rv_ff', 'tline'
                 'hwx', 'uma', 'time_before', 'time_after']
 

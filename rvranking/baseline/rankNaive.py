@@ -20,11 +20,9 @@ def rank_rvs():
                                                             )
     ncdg1_li = []
     mrr_li = []
-    s_features = _EVENT_FEATURES
-    rv_features = _RV_FEATURES
 
     for s in sample_list_test:
-        ncdg1, mrr = predict_rv(s, s_features, rv_features)  # sets rv.prediction$
+        ncdg1, mrr = predict_rv(s)  # sets rv.prediction$
         ncdg1_li.append(ncdg1)
         mrr_li.append(mrr)
 

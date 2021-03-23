@@ -1,4 +1,5 @@
-from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN, _EVENT_FEATURES, _RV_FEATURES
+from rvranking.globalVars import RELEVANCE, _SAMPLING, _LIST_SIZE, _SAME_TEST_TRAIN, _EVENT_FEATURES, _RV_FEATURES, \
+    _RV_EQ
 from rvranking.dataPrep import TD_PERWK, WEEKS_A, WEEKS_B, KMAX, samples, rvs, timelines, rvfirstev, allevents
 from rvranking.logs import hplogger
 from rvranking.sampling.fakeSampling import iterate_samples
@@ -109,7 +110,10 @@ def check_gespever(s):
 
 
 def assign_relevance(s):
-    rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
+    if _RV_EQ:
+        rvs = [s.rv] + list(s.rv_eq)  # correct answer; rv_eq without s.rv
+    else:
+        rvs = [s.rv]
     cnt_relevant_rvs = 0
     relevant_rvs = []
     rvli = s.rvli.copy()  # needs to be seperate list with same items to remove items and iterate over!
@@ -124,6 +128,7 @@ def assign_relevance(s):
     int_slice = _LIST_SIZE - cnt_relevant_rvs
     random.shuffle(s.rvli)
     s.rvli = s.rvli[:int_slice] + relevant_rvs
+    random.shuffle(s.rvli)
     return True
 
 

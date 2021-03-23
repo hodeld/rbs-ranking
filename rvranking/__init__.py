@@ -12,7 +12,7 @@ from rvranking.globalVars import (_MODEL_DIR, _FAKE, _LIST_SIZE,
                                   _SAVE_CHECKPOINT_STEPS,
                                   _SAMPLING,
                                   _LOSS,
-                                  change_var, _SHUFFLE_DATASET)
+                                  change_var, _SHUFFLE_DATASET, _RV_EQ)
 from rvranking.dataPrep import base_store_path, IN_COLAB, WEEKS_B, TD_PERWK
 from rvranking.baseline.rankNaive import rank_rvs
 from rvranking.prediction import make_predictions
@@ -146,6 +146,7 @@ def scikit_main():
                 'sampling method': _SAMPLING,
                 'relevance': RELEVANCE,
                 'td_perweek': TD_PERWK,
+                'rv_eq_included': _RV_EQ,
                 }
     write_file(hyparams)
 
@@ -160,7 +161,7 @@ if __name__ == '__main__':
         4: iterate_samples_train,  # including train
         5: scikit_main,
     }
-    dispatch_fn[5]()
+    dispatch_fn[2]()
 
 
 

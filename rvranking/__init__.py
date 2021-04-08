@@ -161,7 +161,7 @@ if __name__ == '__main__':
         4: iterate_samples_train,  # including train
         5: scikit_main,
     }
-    dispatch_fn[2]()
+    dispatch_fn[5]()
 
 
 

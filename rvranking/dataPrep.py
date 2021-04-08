@@ -30,7 +30,7 @@ else:
 
 _TD_SEQ_HR = 5
 _DAY_HR = 10
-_TD_PER_DAY = _DAY_HR / _TD_SEQ_HR
+_TD_PER_DAY = int(_DAY_HR / _TD_SEQ_HR)
 _TD_PERWK = 5 * _TD_PER_DAY  # nr or None
 
 

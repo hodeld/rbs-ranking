@@ -1,6 +1,6 @@
-#README rbs-ranking
+#rbs-ranking
 Ranking problem to rank legal representatives (rv) regarding legal hearings.
-##Features
+##Classifying Features
 Timeline of rv, gender of rv, type of event, place of event, gender of client..
 ##Libraries
 - tensorflow-ranking 
@@ -11,7 +11,7 @@ Timeline of rv, gender of rv, type of event, place of event, gender of client..
 - split into train and test data
 - prediction
 - evaluation
-## Hyperparameter evaluation
+##Hyperparameter evaluation
 Hyperparameters can be modified in globalVars.py
 ##Installation
 Install using pip: `python -m pip install requirements.txt`

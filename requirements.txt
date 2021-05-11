@@ -1,9 +1,12 @@
 matplotlib==3.3.0
 numpy==1.18.2
 pandas==1.0.3
+onnxruntime==1.7.0
 scikit-learn==0.23.2
+skl2onnx==1.8.0
 tensorboard==2.1.1
 tensorflow==2.1.0
 tensorflow-estimator==2.1.0
 tensorflow-ranking==0.3.0
 tensorflow-serving-api==2.1.0
+

@@ -7,7 +7,10 @@ from sklearn.preprocessing import MinMaxScaler, FunctionTransformer, StandardSca
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import accuracy_score
 from sklearn.inspection import permutation_importance
-import joblib
+
+from skl2onnx import convert_sklearn, to_onnx
+from skl2onnx.common.data_types import FloatTensorType, StringTensorType
+import onnxruntime as rt
 import pathlib
 
 from rvranking.prediction.sampling import get_test_samples
@@ -45,50 +48,29 @@ def fit_predict():
     x_train, y_train, xy_train, x_test, y_test, xy_test = get_data()  # uma and hwx are objects
     clf = RandomForestClassifier(random_state=0)
 
-    tfr_name = 'column'
+    tfr_name = 'std_scaler'  # make_column_selector not working with onnx, needs ColumnTranformer wout named columns
     tfr = transf_dict[tfr_name]
 
     hplogger.info('transformer: ' + tfr_name)
 
     parent = pathlib.Path(__file__).resolve().parents[2]
-    fpath = pathlib.Path(parent, 'output', 'saved_models', 'scikit_mod', 'pipe.pkl')
+    fpath = pathlib.Path(parent, 'output', 'saved_models', 'scikit_mod', 'pipe.onnx')
     if not _RESTORE:
         pipe = make_pipeline(tfr, clf)
         pipe.fit(x_train, y_train)
         if _SAVE_MODEL:
-            joblib.dump(pipe, fpath)
+            model_onnx = to_onnx(pipe, np.array(x_train[:1].astype(np.float32)))  #  training set, can be None, it is
+                                                                        # used to infered the input types
+
+            with open(fpath, "wb") as f:
+                f.write(model_onnx.SerializeToString())
 
     else:
-        pipe = joblib.load(fpath)
+        sess = rt.InferenceSession(fpath.absolute())
+        pred_onx = sess.run(None, {'X': np.array(x_test.astype(np.float32))})[0]
+        acc_sc = accuracy_score(y_test, pred_onx)
 
-    acc_sc = accuracy_score(y_test, pipe.predict(x_test))
-    print('acc_sc', acc_sc)
-    print('classes', pipe.named_steps['randomforestclassifier'].classes_)  # todo better: regression?!
-    hplogger.info('named_steps: ' + str(list(pipe.named_steps.keys())))
-    hplogger.info('acc_sc: ' + str(acc_sc))
-
-    imp_features = features_importance(pipe, x_train)
-    features_plot(x_train, imp_features)
-
-    mrr_mean, mrrs, li_probs = score_per_event(pipe, x_test, xy_test)
-    hplogger.info('mrr_mean: ' + str(mrr_mean))
-    print('mrr_mean', acc_sc)
-
-    sample_list_pred, s_order = get_test_samples()
-    x_pred, y_pred, xy_pred = x_y_data(sample_list_pred)
-    mrr_mean, mrrs, li_probs = score_per_event(pipe, x_pred, xy_pred)
-
-    s_sorted = sorted(s_order)
-    indices = [s_order.index(s) for s in s_sorted]
-    pred_in_order = []
-    rv_data = get_rv_data(sample_list_pred)
-    for i in indices:
-        print('sample ', s_order[i], 'mrr', mrrs[i], 'labels', xy_pred[i], 'probs',
-              [round(p, 2) for p in li_probs[i]], 'rvid', rv_data[i])
-        pred_in_order.append(mrrs[i])
-
-    hplogger.info('mrr_pred_sorted: ' + str(pred_in_order))
-    hplogger.info('mrr_predictions_av: ' + str(mrr_mean))
+    #  analysis for prediction needs to be rewritten
 
 
 def analyze_transform(x_train, pipe):

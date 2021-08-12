@@ -66,9 +66,10 @@ def fit_predict():
                 f.write(model_onnx.SerializeToString())
 
     else:
-        sess = rt.InferenceSession(fpath.absolute())
+        sess = rt.InferenceSession(str(fpath.absolute()))
         pred_onx = sess.run(None, {'X': np.array(x_test.astype(np.float32))})[0]
         acc_sc = accuracy_score(y_test, pred_onx)
+        print('')
 
     #  analysis for prediction needs to be rewritten
 

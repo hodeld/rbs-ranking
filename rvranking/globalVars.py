@@ -15,7 +15,7 @@ _SAMPLING = 'acc_added_rv'   # 'acc_added_rv' OR 'all_zero' OR 'filling_up' OR f
 
 #  scikit model
 _SAVE_MODEL = True
-_RESTORE = False
+_RESTORE = True
 
 _RV_EQ = True  # True or False: if rv_eq should have relevance of 1
 
